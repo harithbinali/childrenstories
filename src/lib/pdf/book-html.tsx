@@ -2,7 +2,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { BookPage, type BookPageProps } from "@/components/book/BookPage";
 import { TRIM, type Orientation } from "@/lib/book/layout-spec";
 
-export type PdfFont = { family: string; weight: number; style?: string; dataUrl: string };
+export type PdfFont = { family: string; weight: string; style?: string; dataUrl: string };
 
 /**
  * A self-contained HTML document (fonts + images inlined as data URLs) where

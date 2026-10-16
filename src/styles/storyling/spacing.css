@@ -1,0 +1,5 @@
+:root{
+--space-0:0;--space-1:4px;--space-2:8px;--space-3:12px;--space-4:16px;--space-5:20px;--space-6:24px;--space-7:32px;--space-8:40px;--space-9:56px;--space-10:72px;--space-11:96px;--space-12:128px;
+--gutter:clamp(16px,4vw,48px)/* @kind spacing */;--section-y:clamp(56px,9vw,128px)/* @kind spacing */;--content-max:1200px;--reading-max:680px;
+--hit-min:44px;--control-sm:40px;--control-md:52px;--control-lg:64px;
+}

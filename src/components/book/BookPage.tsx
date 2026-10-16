@@ -10,8 +10,8 @@ import { storyTypography, textRegion, type AgeRange, type Language, type Orienta
  * (container query units), so the page scales identically on a phone, a
  * tablet and a printed 8x12in sheet.
  *
- * Visual styling uses CSS custom properties (--book-*) defined by the
- * Storyling design tokens; fallbacks are neutral placeholders.
+ * Colours and fonts are Storyling tokens. Each var() carries the literal
+ * value as fallback because the PDF renderer loads no token stylesheet.
  */
 
 export type BookPageProps = {
@@ -37,7 +37,9 @@ const pct = (n: number) => `${(n * 100).toFixed(3)}%`;
 export function BookPage(p: BookPageProps) {
   const dir = p.language === "ar" ? "rtl" : "ltr";
   const type = storyTypography(p.ageRange, p.language, p.orientation);
-  const fontFamily = p.language === "ar" ? "var(--book-font-ar, 'Noto Naskh Arabic', serif)" : "var(--book-font-en, Georgia, serif)";
+  // Storyling story type: Andika (Latin) / Baloo Bhaijaan 2 (Arabic).
+  const fontFamily = p.language === "ar" ? "var(--font-story-ar, 'Baloo Bhaijaan 2', sans-serif)" : "var(--font-story-latin, Andika, sans-serif)";
+  const displayFamily = p.language === "ar" ? "var(--font-display-ar, 'Baloo Bhaijaan 2', sans-serif)" : "var(--font-display-latin, 'Baloo Bhaijaan 2', Andika, sans-serif)";
 
   const root: CSSProperties = {
     position: "relative",
@@ -45,8 +47,8 @@ export function BookPage(p: BookPageProps) {
     height: "100%",
     overflow: "hidden",
     containerType: "inline-size",
-    background: "var(--book-paper, #fffaf2)",
-    color: "var(--book-ink, #2b2238)",
+    background: "var(--paper, #FFFBF2)",
+    color: "var(--ink-900, #1B2457)",
     fontFamily,
   };
 
@@ -56,13 +58,20 @@ export function BookPage(p: BookPageProps) {
   ) : null;
 
   if (p.kind === "front_cover") {
+    const titleStyle: CSSProperties = {
+      display: "block", margin: 0, fontFamily: displayFamily, fontSize: cqw(p.language === "ar" ? 46 : 42, p.orientation),
+      lineHeight: 1.15, fontWeight: 700, color: "var(--ink-900, #1B2457)",
+    };
     return (
       <section dir={dir} lang={p.language} style={root} data-page-kind="front_cover">
         {art}
         <div style={{ position: "absolute", insetInline: "6%", top: "5%", textAlign: "center" }}>
-          <h1 style={{ margin: 0, fontSize: cqw(p.language === "ar" ? 46 : 42, p.orientation), lineHeight: 1.15, fontWeight: 700, color: "var(--book-title, #2b2238)", textShadow: "0 0.4cqw 1.2cqw rgba(255,255,255,0.85)" }}>
-            {p.title}
-          </h1>
+          {/* The die-cut sticker outline is a separate decorative layer: stroked text is
+              embedded as Type 3 in PDFs, while the title itself stays real, searchable text. */}
+          <div style={{ position: "relative" }}>
+            <span aria-hidden="true" style={{ ...titleStyle, position: "absolute", inset: 0, WebkitTextStroke: "0.16em #FFFFFF", textShadow: "0 0.09em 0 rgba(27,36,87,.18), 0 0.2em 0.3em rgba(27,36,87,.18)" }}>{p.title}</span>
+            <h1 style={{ ...titleStyle, position: "relative" }}>{p.title}</h1>
+          </div>
           {p.subtitle ? <p style={{ margin: "1.5cqw 0 0", fontSize: cqw(18, p.orientation) }}>{p.subtitle}</p> : null}
         </div>
       </section>
@@ -103,9 +112,9 @@ export function BookPage(p: BookPageProps) {
             margin: 0,
             width: "100%",
             padding: "2.4cqw 3cqw",
-            borderRadius: "var(--book-panel-radius, 3cqw)",
-            background: "var(--book-panel, rgba(255, 250, 242, 0.9))",
-            boxShadow: "var(--book-panel-shadow, 0 0.6cqw 2cqw rgba(43, 34, 56, 0.12))",
+            borderRadius: "4cqw 3cqw 4.4cqw 2.8cqw", // Storyling wobble radius, scaled to the page
+            background: "rgba(255, 251, 242, 0.92)", // --paper
+            boxShadow: "0 1.6cqw 3.4cqw -1.8cqw rgba(27, 36, 87, .38), 0 0.2cqw 0.6cqw -0.2cqw rgba(27, 36, 87, .08)", // --shadow-card
             fontSize: cqw(type.fontSizePt, p.orientation),
             lineHeight: type.lineHeight,
             textAlign: type.align,

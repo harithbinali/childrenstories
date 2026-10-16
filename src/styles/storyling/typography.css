@@ -1,0 +1,30 @@
+:root{
+--font-display-latin:"Fredoka","Baloo Bhaijaan 2",ui-rounded,"SF Pro Rounded",system-ui,sans-serif;
+--font-body-latin:"Nunito","Tajawal",ui-rounded,system-ui,sans-serif;
+--font-story-latin:"Andika","Nunito",system-ui,sans-serif;
+--font-display-ar:"Baloo Bhaijaan 2","Fredoka",system-ui,sans-serif;
+--font-body-ar:"Tajawal","Nunito",system-ui,sans-serif;
+--font-story-ar:"Baloo Bhaijaan 2","Tajawal",system-ui,sans-serif;
+--font-display:var(--font-display-latin);--font-body:var(--font-body-latin);--font-story:var(--font-story-latin);
+--font-mono:ui-monospace,"SF Mono",Menlo,monospace;
+
+/* Scale — mobile-first fluid display sizes */
+--text-hero:clamp(44px,7.5vw,104px);--text-h1:clamp(36px,5.2vw,68px);--text-h2:clamp(28px,3.8vw,46px);--text-h3:26px;--text-h4:21px;
+--text-lg:19px;--text-md:17px;--text-sm:15px;--text-xs:13px;--text-story:clamp(20px,2.2vw,26px);
+--leading-tight:1.02;--leading-snug:1.18;--leading-body:1.55;--leading-story:1.7;
+--weight-regular:400;--weight-semibold:600;--weight-bold:700;--weight-black:800;
+--tracking-display:-0.01em;--tracking-caps:0.06em;
+
+/* Semantic roles */
+--type-hero:600 var(--text-hero)/var(--leading-tight) var(--font-display);
+--type-h1:600 var(--text-h1)/var(--leading-tight) var(--font-display);
+--type-h2:600 var(--text-h2)/var(--leading-snug) var(--font-display);
+--type-h3:600 var(--text-h3)/var(--leading-snug) var(--font-display);
+--type-h4:600 var(--text-h4)/1.25 var(--font-display);
+--type-body-lg:500 var(--text-lg)/var(--leading-body) var(--font-body);
+--type-body:500 var(--text-md)/var(--leading-body) var(--font-body);
+--type-small:600 var(--text-sm)/1.45 var(--font-body);
+--type-caption:700 var(--text-xs)/1.3 var(--font-body);
+--type-story:400 var(--text-story)/var(--leading-story) var(--font-story);
+}
+[dir="rtl"]{--font-display:var(--font-display-ar);--font-body:var(--font-body-ar);--font-story:var(--font-story-ar);--tracking-display:0;--tracking-caps:0}

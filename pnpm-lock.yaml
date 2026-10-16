@@ -11,6 +11,9 @@ importers:
       '@paypal/paypal-server-sdk':
         specifier: ^2.5.0
         version: 2.5.0
+      '@phosphor-icons/web':
+        specifier: 2.1.1
+        version: 2.1.1
       '@supabase/ssr':
         specifier: ^0.12.7
         version: 0.12.7(@supabase/supabase-js@2.118.0)
@@ -694,6 +697,9 @@ packages:
 
   '@pdf-lib/upng@1.0.1':
     resolution: {integrity: sha512-dQK2FUMQtowVP00mtIksrlZhdFXQZPC+taih1q4CvPZ5vqdxR/LKBaFg0oAfzd1GlHZXXSPdQfzQnt+ViGvEIQ==}
+
+  '@phosphor-icons/web@2.1.1':
+    resolution: {integrity: sha512-QjrfbItu5Rb2i37GzsKxmrRHfZPTVk3oXSPBnQ2+oACDbQRWGAeB0AsvZw263n1nFouQuff+khOCtRbrc6+k+A==}
 
   '@playwright/test@1.64.1':
     resolution: {integrity: sha512-IaYGml/nSOiZWROfPtuIL7neuu9qDOZ3TNvNljUIrhDMxiGTgPjzj/g9p9RxpS2tSepPDRY+UwAaEeiKtUvIAg==}
@@ -3410,6 +3416,8 @@ snapshots:
   '@pdf-lib/upng@1.0.1':
     dependencies:
       pako: 1.0.11
+
+  '@phosphor-icons/web@2.1.1': {}
 
   '@playwright/test@1.64.1':
     dependencies:

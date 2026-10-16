@@ -1,44 +1,63 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createServerClient } from "@supabase/ssr";
+import { LOCALE_COOKIE, isLocale, negotiateLocale } from "@/i18n/config";
 
-const PROTECTED_PREFIXES = ["/dashboard", "/admin", "/design-system"];
+const PROTECTED_PREFIXES = ["/dashboard", "/admin"];
 
 /**
- * Refreshes the Supabase session cookie on every request and performs a fast,
- * optimistic redirect for signed-out visitors. Real authorization happens in
- * the data access layer (lib/auth/guards.ts) and in RLS — never only here.
+ * 1. Locale: public URLs carry no locale prefix (/dashboard). Requests are
+ *    rewritten to /{locale}/... using the language cookie, then the
+ *    browser's Accept-Language. Explicit /ar/... URLs also work.
+ * 2. Refreshes the Supabase session cookie on the same response.
+ * 3. Optimistic redirect to /login for signed-out visitors. Real
+ *    authorization happens in lib/auth/guards.ts and in RLS — never only here.
  */
 export async function proxy(request: NextRequest) {
-  let response = NextResponse.next({ request });
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-  if (!url || !key) return response;
-
-  const supabase = createServerClient(url, key, {
-    cookies: {
-      getAll: () => request.cookies.getAll(),
-      setAll: (toSet, headers) => {
-        toSet.forEach(({ name, value }) => request.cookies.set(name, value));
-        response = NextResponse.next({ request });
-        toSet.forEach(({ name, value, options }) => response.cookies.set(name, value, options));
-        Object.entries(headers ?? {}).forEach(([k, v]) => response.headers.set(k, v));
-      },
-    },
-  });
-
-  const { data } = await supabase.auth.getClaims();
-  const signedIn = Boolean(data?.claims?.sub);
   const { pathname, search } = request.nextUrl;
+  const first = pathname.split("/")[1];
+  const prefixed = isLocale(first);
+  const locale = prefixed ? first : (() => {
+    const c = request.cookies.get(LOCALE_COOKIE)?.value;
+    return isLocale(c) ? c : negotiateLocale(request.headers.get("accept-language"));
+  })();
+  const barePath = prefixed ? pathname.slice(first.length + 1) || "/" : pathname;
 
-  if (!signedIn && PROTECTED_PREFIXES.some((p) => pathname === p || pathname.startsWith(`${p}/`))) {
+  const makeResponse = () => {
+    if (prefixed) return NextResponse.next({ request });
+    const url = request.nextUrl.clone();
+    url.pathname = `/${locale}${pathname === "/" ? "" : pathname}`;
+    return NextResponse.rewrite(url, { request });
+  };
+  let response = makeResponse();
+
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  let signedIn = false;
+  if (supabaseUrl && supabaseKey) {
+    const supabase = createServerClient(supabaseUrl, supabaseKey, {
+      cookies: {
+        getAll: () => request.cookies.getAll(),
+        setAll: (toSet, headers) => {
+          toSet.forEach(({ name, value }) => request.cookies.set(name, value));
+          response = makeResponse();
+          toSet.forEach(({ name, value, options }) => response.cookies.set(name, value, options));
+          Object.entries(headers ?? {}).forEach(([k, v]) => response.headers.set(k, v));
+        },
+      },
+    });
+    const { data } = await supabase.auth.getClaims();
+    signedIn = Boolean(data?.claims?.sub);
+  }
+
+  if (!signedIn && PROTECTED_PREFIXES.some((p) => barePath === p || barePath.startsWith(`${p}/`))) {
     const login = request.nextUrl.clone();
     login.pathname = "/login";
-    login.search = `?next=${encodeURIComponent(pathname + search)}`;
+    login.search = `?next=${encodeURIComponent(barePath + search)}`;
     return NextResponse.redirect(login);
   }
   return response;
 }
 
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico|api/webhooks|api/cron|.*\\.(?:svg|png|jpg|jpeg|gif|webp|woff2?)$).*)"],
+  matcher: ["/((?!api/|_next/static|_next/image|favicon.ico|fonts/|.*\\.(?:svg|png|jpg|jpeg|gif|webp|woff2?|ttf|ico|txt|xml)$).*)"],
 };

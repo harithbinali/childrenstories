@@ -1,0 +1,16 @@
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;font:var(--type-body);color:var(--text-body);background:var(--surface-page);-webkit-font-smoothing:antialiased}
+h1,h2,h3,h4{font-family:var(--font-display);color:var(--text-strong);letter-spacing:var(--tracking-display);margin:0;text-wrap:balance}
+p{margin:0;text-wrap:pretty}
+a{color:var(--text-link);text-decoration-thickness:2px;text-underline-offset:3px;font-weight:700}
+a:hover{color:var(--blue-800);text-decoration-style:wavy}
+:focus-visible{outline:3px dashed var(--focus-ring);outline-offset:4px;border-radius:12px}
+::selection{background:var(--sun-200);color:var(--ink-900)}
+/* Sticker headline: white outline + navy drop, like a die-cut sticker */
+.sl-sticker-text{font-family:var(--font-display);font-weight:700;paint-order:stroke fill;-webkit-text-stroke:.16em var(--white);text-shadow:0 .09em 0 rgba(27,36,87,.18),0 .2em .3em rgba(27,36,87,.18);letter-spacing:var(--tracking-display)}
+.sl-hl{background:linear-gradient(transparent 58%,var(--sun-200) 58%,var(--sun-200) 92%,transparent 92%);padding-inline:.08em}
+.sl-eyebrow{font:var(--type-caption);text-transform:uppercase;letter-spacing:var(--tracking-caps);color:var(--blue-600)}
+.sl-dashed-path{border:2.5px dashed var(--ink-300);border-radius:50%}
+[dir="rtl"] .sl-flip-rtl{transform:scaleX(-1)}
+.sl-visually-hidden{position:absolute!important;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}

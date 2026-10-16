@@ -1,0 +1,10 @@
+/* Storyling Design System — production entry (mirrors design/storyling/styles.css).
+   Phosphor icon fonts are imported in app/[locale]/layout.tsx (bundled, self-hosted). */
+@import "./colors.css";
+@import "./typography.css";
+@import "./fonts.css";
+@import "./spacing.css";
+@import "./effects.css";
+@import "./motion.css";
+@import "./base.css";
+@import "./components.css";

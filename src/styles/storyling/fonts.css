@@ -1,0 +1,12 @@
+/* Production font mapping. design/storyling/tokens/fonts.css loads these same
+   families from the Google Fonts CDN; here they are self-hosted by next/font
+   (see src/app/[locale]/fonts.ts) and exposed as --ff-* variables. Fallback
+   order is identical to tokens/typography.css. */
+:root{
+--font-display-latin:var(--ff-fredoka),var(--ff-baloo),ui-rounded,"SF Pro Rounded",system-ui,sans-serif;
+--font-body-latin:var(--ff-nunito),var(--ff-tajawal),ui-rounded,system-ui,sans-serif;
+--font-story-latin:var(--ff-andika),var(--ff-nunito),system-ui,sans-serif;
+--font-display-ar:var(--ff-baloo),var(--ff-fredoka),system-ui,sans-serif;
+--font-body-ar:var(--ff-tajawal),var(--ff-nunito),system-ui,sans-serif;
+--font-story-ar:var(--ff-baloo),var(--ff-tajawal),system-ui,sans-serif;
+}

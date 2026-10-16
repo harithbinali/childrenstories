@@ -1,15 +1,26 @@
 import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
-import { PDFDocument } from "pdf-lib";
+import { PDFDict, PDFDocument, PDFName } from "pdf-lib";
 import { buildBookHtml } from "../book-html";
 import { renderPdf } from "../render";
 import { buildPageSequence } from "@/lib/book/layout-spec";
 
 const root = join(__dirname, "../../../..");
-const font = (f: string) => `data:font/ttf;base64,${readFileSync(join(root, "public/fonts/provisional", f)).toString("base64")}`;
+const font = (f: string) => `data:font/ttf;base64,${readFileSync(join(root, "public/fonts/book", f)).toString("base64")}`;
 const img = (f: string) => `data:image/png;base64,${readFileSync(join(root, "src/lib/uploads/__fixtures__", f)).toString("base64")}`;
 // Needs a Chromium: set PDF_TESTS=1 (Playwright-managed browser) or CHROMIUM_PATH.
+/** Font subtypes used on a page (Type0 = CID TrueType, Type3 = glyph procedures). */
+function fontSubtypes(doc: PDFDocument, pageIndex: number): string[] {
+  const resources = doc.getPage(pageIndex).node.Resources();
+  const fonts = resources?.lookupMaybe(PDFName.of("Font"), PDFDict);
+  if (!fonts) return [];
+  return fonts.values().map((ref) => {
+    const font = doc.context.lookup(ref, PDFDict);
+    return String(font.get(PDFName.of("Subtype"))).replace("/", "");
+  });
+}
+
 const hasChromium = Boolean(process.env.CHROMIUM_PATH || process.env.PDF_TESTS === "1");
 
 describe.runIf(hasChromium)("PDF rendering (Chromium)", () => {
@@ -25,8 +36,9 @@ describe.runIf(hasChromium)("PDF rendering (Chromium)", () => {
     const html = buildBookHtml({
       orientation, language: "ar", title: "test", pages,
       fonts: [
-        { family: "Noto Naskh Arabic", weight: 400, dataUrl: font("NotoNaskhArabic-Regular.ttf") },
-        { family: "Noto Naskh Arabic", weight: 700, dataUrl: font("NotoNaskhArabic-Bold.ttf") },
+        { family: "Andika", weight: "400", dataUrl: font("Andika-Regular.ttf") },
+        { family: "Baloo Bhaijaan 2", weight: "400", dataUrl: font("BalooBhaijaan2-400.ttf") },
+        { family: "Baloo Bhaijaan 2", weight: "700", dataUrl: font("BalooBhaijaan2-700.ttf") },
       ],
     });
     const pdf = await renderPdf(html, orientation);
@@ -38,6 +50,14 @@ describe.runIf(hasChromium)("PDF rendering (Chromium)", () => {
     if (process.env.PDF_TEST_OUT) {
       mkdirSync(process.env.PDF_TEST_OUT, { recursive: true });
       writeFileSync(join(process.env.PDF_TEST_OUT, `arabic-${orientation}.pdf`), pdf);
+    }
+    // Text must be embedded as real outline fonts (not Type 3) for print shops.
+    // Only the cover's decorative sticker-outline layer may use Type 3.
+    for (let i = 0; i < doc.getPageCount(); i++) {
+      const types = fontSubtypes(doc, i);
+      expect(types.length).toBeGreaterThan(0);
+      if (i > 0) expect(types).not.toContain("Type3");
+      else expect(types).toContain("Type0"); // the real title text
     }
   }, 60_000);
 });
