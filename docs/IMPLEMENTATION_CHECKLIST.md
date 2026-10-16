@@ -62,7 +62,7 @@ Legend: ✅ done & verified · 🟡 built, not yet verified against the live ser
 | 19 | Admin roles: staff = operations (read-only data, job retry/cancel, support); admin = money, catalog, configuration, suspensions, deletions. Every write re-checks the role, validates, and writes an audit log entry. Child photos are never shown in admin | ✅ |
 | 19 | Marketing content overrides (hero, pricing text, FAQs, promo banner, contact) applied to the live site; Google sign-in and design-system switches read from platform settings | ✅ |
 | 23 | Support tickets UI (list, new request linked to a book/order, conversation, reply, close) | ✅ reviewed via preview routes · RLS tested · staff side ships with the admin dashboard |
-| 26 | E2E tests (Playwright) | ⏳ |
+| 26 | E2E tests (Playwright, `e2e/`): every public page EN/AR at tablet + phone (status, dir, no overflow, no console errors), signed-out protection of dashboard/admin/reader/PDF, unsigned webhooks and cron rejected, sitemap/robots, language toggle, reader keys/buttons/contents + RTL | ✅ 94 passing against a production build; in CI · 🟡 signed-in journeys need a Supabase test project (B2) |
 | 27 | Vercel + worker deployment | ⛔ B4 |
 
 ## Known limitations (current)
