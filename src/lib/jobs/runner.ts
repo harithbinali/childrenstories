@@ -2,8 +2,9 @@ import "@/lib/server-guard";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { AiError } from "@/lib/ai/errors";
 import { LimitError } from "@/lib/limits/check";
-import { handlers } from "./handlers";
-import { PermanentJobError, type JobRow } from "./types";
+import { PermanentJobError, type JobHandler, type JobRow, type JobType } from "./types";
+
+export type HandlerRegistry = Partial<Record<JobType, JobHandler>>;
 
 const LEASE_SECONDS = 300;
 
@@ -13,7 +14,7 @@ function isRetryable(e: unknown): boolean {
   return true; // unknown/infra errors (network, storage) are worth a retry
 }
 
-export async function runJob(job: JobRow, workerId: string): Promise<"completed" | "queued" | "failed"> {
+export async function runJob(job: JobRow, workerId: string, handlers: HandlerRegistry): Promise<"completed" | "queued" | "failed"> {
   const db = createAdminClient();
   const handler = handlers[job.type];
   const heartbeat = setInterval(() => {
@@ -64,12 +65,12 @@ async function onJobFailedPermanently(job: JobRow, message: string) {
  * Claims and runs up to `limit` jobs concurrently, stopping claims once the
  * deadline passes. Used by the long-running worker and the Vercel Cron route.
  */
-export async function processBatch(workerId: string, limit: number, opts: { types?: string[] } = {}) {
+export async function processBatch(workerId: string, limit: number, handlers: HandlerRegistry) {
   const { data, error } = await createAdminClient().rpc("claim_generation_jobs", {
-    p_worker: workerId, p_limit: limit, p_lease_seconds: LEASE_SECONDS, p_types: opts.types ?? null,
+    p_worker: workerId, p_limit: limit, p_lease_seconds: LEASE_SECONDS, p_types: Object.keys(handlers),
   });
   if (error) throw new Error(`claim failed: ${error.message}`);
   const jobs = (data ?? []) as JobRow[];
-  const results = await Promise.all(jobs.map((j) => runJob(j, workerId)));
+  const results = await Promise.all(jobs.map((j) => runJob(j, workerId, handlers)));
   return { claimed: jobs.length, results };
 }

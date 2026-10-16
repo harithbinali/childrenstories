@@ -8,6 +8,7 @@
  */
 import { hostname } from "node:os";
 import { processBatch } from "@/lib/jobs/runner";
+import { handlers } from "@/lib/jobs/handlers";
 import { enqueueJob } from "@/lib/jobs/enqueue";
 import { getSettings } from "@/lib/settings";
 import { createAdminClient } from "@/lib/supabase/admin";
@@ -28,7 +29,7 @@ async function scheduleMaintenance() {
 async function slot(n: number) {
   while (!stopping) {
     try {
-      const { claimed } = await processBatch(`${workerId}#${n}`, 1);
+      const { claimed } = await processBatch(`${workerId}#${n}`, 1, handlers);
       if (claimed === 0) await sleep(IDLE_DELAY_MS);
     } catch (e) {
       console.error(`[worker] slot ${n} error`, e);

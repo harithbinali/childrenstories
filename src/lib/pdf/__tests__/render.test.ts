@@ -9,7 +9,8 @@ import { buildPageSequence } from "@/lib/book/layout-spec";
 const root = join(__dirname, "../../../..");
 const font = (f: string) => `data:font/ttf;base64,${readFileSync(join(root, "public/fonts/provisional", f)).toString("base64")}`;
 const img = (f: string) => `data:image/png;base64,${readFileSync(join(root, "src/lib/uploads/__fixtures__", f)).toString("base64")}`;
-const hasChromium = Boolean(process.env.CHROMIUM_PATH);
+// Needs a Chromium: set PDF_TESTS=1 (Playwright-managed browser) or CHROMIUM_PATH.
+const hasChromium = Boolean(process.env.CHROMIUM_PATH || process.env.PDF_TESTS === "1");
 
 describe.runIf(hasChromium)("PDF rendering (Chromium)", () => {
   it.each(["portrait", "landscape"] as const)("renders an Arabic %s book with exact trim size and one PDF page per book page", async (orientation) => {
