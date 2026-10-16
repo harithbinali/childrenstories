@@ -7,6 +7,7 @@ import { legalEn } from "@/content/legal/en";
 import type { LegalSlug } from "@/content/legal/types";
 import { getPublicCatalog, type Catalog } from "@/lib/catalog";
 import { getPublicSettings } from "@/lib/public-settings";
+import { applyMarketingContent, getMarketingContent } from "@/lib/marketing-content";
 import { isLocale, type Locale } from "@/i18n/config";
 import { getDictionary, type Dictionary } from "@/i18n/dictionaries";
 import { LegalView } from "./LegalView";
@@ -57,7 +58,9 @@ export function publicPage(slug: PublicSlug) {
     const l = await localeParam();
     if (!isLocale(l)) notFound();
     const p: Entry = PUBLIC_PAGES[slug];
-    const [catalog, settings] = await Promise.all([p.catalog ? getPublicCatalog(l) : null, slug === "contact" ? getPublicSettings() : null]);
-    return p.render({ d: getDictionary(l), locale: l, catalog, supportEmail: settings?.supportEmail ?? null });
+    const [catalog, settings, content] = await Promise.all([p.catalog ? getPublicCatalog(l) : null, slug === "contact" ? getPublicSettings() : null, getMarketingContent(l)]);
+    let d = applyMarketingContent(getDictionary(l), content);
+    if (content.contact?.address) d = { ...d, pages: { ...d.pages, contact: { ...d.pages.contact, address: content.contact.address } } };
+    return p.render({ d, locale: l, catalog, supportEmail: content.contact?.email || settings?.supportEmail || null });
   };
 }

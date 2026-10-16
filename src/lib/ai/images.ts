@@ -35,15 +35,22 @@ export function buildCharacterPrompt(args: { stylePrompt: string; corrections?: 
     .join("\n");
 }
 
+/** Admin-configured size (Admin → AI configuration), falling back to the layout spec. */
+function sizeFor(params: Record<string, unknown>, orientation: Orientation): string {
+  const v = params[orientation === "portrait" ? "portrait_size" : "landscape_size"];
+  return typeof v === "string" && /^\d{3,4}x\d{3,4}$/.test(v) ? v : IMAGE_SIZE[orientation];
+}
+
 /** Photo(s) of the child -> illustrated character reference sheet. */
 export async function generateCharacterReference(
   args: { photos: InputImage[]; stylePrompt: string; corrections?: string | null; quality: QualityTier; appearanceNotes?: string | null },
   ctx: AiContext,
 ): Promise<{ image: Uint8Array; prompt: string; model: string; size: string; costUsd: number | null }> {
-  const size = "1024x1536";
+  let size: string = IMAGE_SIZE.portrait;
   const prompt = buildCharacterPrompt(args);
 
   const { result, costUsd } = await runAI("image", "images.edit:character", ctx, async (client, setting, { signal, safetyId }) => {
+    size = sizeFor(setting.params, "portrait");
     const quality = (setting.params[args.quality === "final" ? "final_quality" : "preview_quality"] as string) ?? "medium";
     const res = await client.images.edit(
       {
@@ -164,10 +171,11 @@ export async function generateSceneIllustration(
   },
   ctx: AiContext,
 ): Promise<{ image: Uint8Array; prompt: string; model: string; size: string; costUsd: number | null }> {
-  const size = IMAGE_SIZE[args.orientation];
+  let size: string = IMAGE_SIZE[args.orientation];
   const prompt = buildScenePrompt(args);
 
   const { result, costUsd } = await runAI("image", `images.edit:${args.kind}`, ctx, async (client, setting, { signal, safetyId }) => {
+    size = sizeFor(setting.params, args.orientation);
     const quality = (setting.params[args.quality === "final" ? "final_quality" : "preview_quality"] as string) ?? "medium";
     const res = await client.images.edit(
       {

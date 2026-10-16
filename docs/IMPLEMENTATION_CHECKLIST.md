@@ -58,7 +58,9 @@ Legend: ✅ done & verified · 🟡 built, not yet verified against the live ser
 | 12 | Storybook creator wizard + book workspace (story editor, previews, checkout panel, production progress) | ✅ reviewed via preview routes · 🟡 live AI/payments (B2/B3) |
 | 14 | Tablet reader: spreads/single pages, swipe/tap/keys (RTL-aware), auto-hiding controls, fullscreen, thumbnails, resume position | ✅ reviewed EN/AR phone/tablet/desktop + interaction script · 🟡 live data (B2) |
 | 16 | Permanent library, favorites, drafts | ✅ pages built · 🟡 live data (B2) |
-| 19 | Admin dashboard | ⏳ |
+| 19 | Admin dashboard: all 20 sections (overview, customers + detail, child profiles, characters, books, jobs, orders + detail, payments + webhook errors, refunds, products + discounts, themes, styles, AI config, usage limits, gateways, marketing content, support + thread, reports, audit logs, platform settings) | ✅ reviewed EN/AR at all sizes via fixture previews · aggregate functions + role checks DB-tested · 🟡 live data and gateway refunds (B2/B3) |
+| 19 | Admin roles: staff = operations (read-only data, job retry/cancel, support); admin = money, catalog, configuration, suspensions, deletions. Every write re-checks the role, validates, and writes an audit log entry. Child photos are never shown in admin | ✅ |
+| 19 | Marketing content overrides (hero, pricing text, FAQs, promo banner, contact) applied to the live site; Google sign-in and design-system switches read from platform settings | ✅ |
 | 23 | Support tickets UI (list, new request linked to a book/order, conversation, reply, close) | ✅ reviewed via preview routes · RLS tested · staff side ships with the admin dashboard |
 | 26 | E2E tests (Playwright) | ⏳ |
 | 27 | Vercel + worker deployment | ⛔ B4 |

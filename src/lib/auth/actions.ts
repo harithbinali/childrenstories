@@ -1,5 +1,6 @@
 "use server";
 import { headers } from "next/headers";
+import { getPublicSettings } from "@/lib/public-settings";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
@@ -131,7 +132,7 @@ export async function resendVerification(_: AuthState, form: FormData): Promise<
 }
 
 export async function signInWithGoogle(form: FormData): Promise<void> {
-  if (await guard("oauth")) redirect("/login?error=not_configured");
+  if ((await guard("oauth")) || !(await getPublicSettings()).googleAuth) redirect("/login?error=not_configured");
   const supabase = await createClient();
   const next = await safeNext(form.get("next"));
   const { data, error } = await supabase.auth.signInWithOAuth({

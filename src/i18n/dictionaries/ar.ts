@@ -1,4 +1,5 @@
 import type { Dictionary } from "./en";
+import { adminAr } from "./admin-ar";
 
 const n = (v: number | string) => String(v).replace(/[0-9]/g, (d) => "٠١٢٣٤٥٦٧٨٩"[Number(d)]);
 
@@ -584,6 +585,7 @@ const ar: Dictionary = {
       address: "[COMPANY LEGAL NAME] · [COMPANY ADDRESS]",
     },
   },
+  admin: adminAr,
   designSystem: {
     title: "نظام تصميم ستوريلنج",
     sub: "مرجع داخلي لمكتبة المكوّنات، مبني على نسخة ستوريلنج الرسمية في design/storyling.",

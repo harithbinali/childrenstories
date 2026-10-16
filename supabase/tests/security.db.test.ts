@@ -259,3 +259,24 @@ describe("account deletion requests", () => {
     expect(again).toBe(1);
   });
 });
+
+describe("admin aggregate functions", () => {
+  it("parents and anonymous visitors cannot call them", async () => {
+    for (const sql of [`select public.admin_overview()`, `select public.admin_report(7)`, `select * from public.admin_customers()`, `select * from public.admin_user_emails(array[gen_random_uuid()])`]) {
+      await expect(as(pool, { role: "authenticated", sub: alice }, (c) => c.query(sql))).rejects.toThrow(/staff only/);
+      await expect(as(pool, { role: "anon" }, (c) => c.query(sql))).rejects.toThrow(/permission denied|staff only/);
+    }
+  });
+
+  it("staff get counts and customer search, with no child photo data", async () => {
+    const overview = await as(pool, { role: "authenticated", sub: staff }, async (c) => (await c.query(`select public.admin_overview() as o`)).rows[0].o);
+    expect(overview.children).toBeGreaterThanOrEqual(1);
+    expect(overview.books).toBeGreaterThanOrEqual(1);
+    const rows = await as(pool, { role: "authenticated", sub: staff }, async (c) => (await c.query(`select * from public.admin_customers('alice@')`)).rows);
+    expect(rows).toHaveLength(1);
+    expect(rows[0]).toMatchObject({ email: "alice@example.test", children: "1" });
+    expect(Object.keys(rows[0])).not.toContain("storage_path");
+    const report = await as(pool, { role: "authenticated", sub: staff }, async (c) => (await c.query(`select public.admin_report(7) as r`)).rows[0].r);
+    expect(report.days).toHaveLength(7);
+  });
+});

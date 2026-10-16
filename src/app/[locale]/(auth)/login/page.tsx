@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { locale as localeParam } from "next/root-params";
 import { LoginForm } from "@/components/auth/AuthForms";
+import { getPublicSettings } from "@/lib/public-settings";
 import { isLocale } from "@/i18n/config";
 import { getDictionary } from "@/i18n/dictionaries";
 
@@ -17,7 +18,7 @@ export default async function Page() {
   const a = getDictionary(l).auth;
   return (
     <Suspense fallback={null}>
-      <LoginForm a={a} googleEnabled={process.env.NEXT_PUBLIC_GOOGLE_AUTH === "true"} />
+      <LoginForm a={a} googleEnabled={(await getPublicSettings()).googleAuth} />
     </Suspense>
   );
 }

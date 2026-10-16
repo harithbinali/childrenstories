@@ -1,3 +1,4 @@
+import { adminEn } from "./admin-en";
 /**
  * English copy. Voice (design/storyling/readme.md): warm storyteller talking
  * to a busy parent; sentence case; verbs on buttons; kind, specific errors;
@@ -584,6 +585,7 @@ const en = {
       address: "[COMPANY LEGAL NAME] · [COMPANY ADDRESS]",
     },
   },
+  admin: adminEn,
   designSystem: {
     title: "Storyling design system",
     sub: "Internal reference for the component library. Built from the official Storyling export in design/storyling.",

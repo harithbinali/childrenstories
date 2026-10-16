@@ -92,6 +92,18 @@ signed URLs after an ownership check, and purged after a configurable retention 
 (`retention.child_photo_days`). OpenAI calls use `store: false` where supported and a
 hashed safety identifier instead of user ids. Staff cannot access photos.
 
+### ADR-9 Admin dashboard access
+`/admin` 404s for anyone who isn't staff. Reads run as the signed-in staff member, so RLS
+still applies (no child photos, ever); cross-account aggregates and email lookups go
+through `admin_*` security-definer functions that check `is_staff()` first. Writes are
+server actions that re-check the role (`requireStaff` for jobs and support,
+`requireAdmin` for money, catalog, configuration, suspensions and deletions), validate
+with zod, write with the service role and append to `admin_audit_logs`. Secret keys
+stay in environment variables: the dashboard only shows whether they are configured.
+Account deletion runs after a 7-day grace period: private files, then the auth user
+(rows cascade); orders are kept without the email address and the request row is kept
+as a record.
+
 ## Data model (summary)
 Identity: `profiles`, `user_roles` · Children: `child_profiles`, `child_photos` ·
 Characters: `characters`, `character_references`, `illustration_styles` ·
