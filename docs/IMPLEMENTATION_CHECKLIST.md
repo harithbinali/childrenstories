@@ -46,10 +46,14 @@ Legend: ✅ done & verified · 🟡 built, not yet verified against the live ser
 | 22 | DB-backed rate limiting | ✅ DB test |
 | 22 | Audit log (append-only, immutable) | ✅ DB test |
 | 23 | Transactional emails (bilingual, idempotent, no child images) | 🟡 · Storyling styling ⏳ |
-| 9 | Auth guards (DAL), proxy session refresh, roles | 🟡 · auth UI ⏳ |
-| 3 | Storyling component library, tokens, `/design-system` | ⏳ |
-| 8 | Marketing website | ⏳ |
-| 10 | Parent dashboard | ⏳ |
+| 9 | Auth guards (DAL), proxy session refresh, roles | 🟡 |
+| 9 | Auth UI: login, register, forgot/reset password, verify email, callback route, optional Google | ✅ renders EN/AR at all sizes · 🟡 live sign-in (B2) |
+| 3 | Storyling tokens (verbatim), self-hosted fonts + icons, 24 components ported to TSX, `/design-system` | ✅ screenshot-reviewed EN/AR, phone/tablet/desktop |
+| 3 | i18n: locale routing (cookie / Accept-Language rewrite), EN + AR dictionaries, RTL | ✅ |
+| 8 | Homepage (all 12 sections from the brief) | ✅ reviewed · illustrations are placeholders until generated (B2) |
+| 8 | Other public pages (how it works, themes, styles, examples, pricing, FAQ, about, contact, legal) | ⏳ |
+| 10 | Dashboard shell (sidebar / mobile tab bar) + overview (children, stats, bookshelf, activity, empty states) | ✅ reviewed via preview route · 🟡 live data (B2) |
+| 10 | Children, characters, books, drafts, favourites, orders, settings, support pages | ⏳ |
 | 12 | Storybook creator wizard | ⏳ (server pieces exist) |
 | 14 | Tablet reader | ⏳ (`BookPage` + layout spec ready) |
 | 16 | Permanent library, favorites, drafts | ⏳ (schema ready) |
@@ -64,5 +68,5 @@ Legend: ✅ done & verified · 🟡 built, not yet verified against the live ser
 - PDF is trim-size without bleed (digital/home printing). A print-shop variant with 0.125 in
   bleed is not built.
 - Orders with a 100% discount (zero total) are rejected; free-book flows are not built.
-- The provisional Arabic font (Noto Naskh Arabic, OFL) will be replaced by Storyling typography.
+- Marketing and empty-state illustrations are Storyling BlobFrame placeholders until original art is generated with OpenAI.
 - Character consistency depends on the image model; regeneration allowances mitigate it.

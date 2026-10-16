@@ -12,6 +12,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Owner-supplied Storyling design export: reference material, not app code.
+    "design/**",
   ]),
 ]);
 

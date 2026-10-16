@@ -32,7 +32,16 @@ const PRESETS: Record<string, DecorItem[]> = {
 };
 
 /** Ambient floating icons (≤6 per area). Never placed over text; disabled under reduced motion. */
-export function FloatingDecor({ preset = "sky", items, style }: { preset?: "sky" | "night" | "magic"; items?: DecorItem[]; style?: CSSProperties }) {
+/** "magic" variant that keeps to the trailing edge, for cards whose text starts at the leading edge. */
+PRESETS.magicEdge = [
+  // Corner zones only: text runs nearly full width on phones.
+  { icon: "star", color: "var(--sun-500)", size: 24, top: "4%", end: "3%", anim: "twinkle", rotate: -12 },
+  { icon: "sparkle", color: "var(--bubble-500)", size: 20, bottom: "26%", end: "4%", anim: "twinkle", delay: 0.5 },
+  { icon: "heart", color: "var(--cherry-400)", size: 18, bottom: "6%", end: "20%", anim: "float", rotate: -14 },
+  { icon: "paper-plane-tilt", color: "var(--grape-400)", size: 30, bottom: "8%", end: "4%", anim: "float", rotate: 8 },
+];
+
+export function FloatingDecor({ preset = "sky", items, style }: { preset?: "sky" | "night" | "magic" | "magicEdge"; items?: DecorItem[]; style?: CSSProperties }) {
   const list = items ?? PRESETS[preset] ?? PRESETS.sky;
   return (
     <div aria-hidden="true" style={{ position: "absolute", inset: 0, pointerEvents: "none", overflow: "hidden", ...style }}>

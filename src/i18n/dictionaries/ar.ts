@@ -202,6 +202,12 @@ const ar: Dictionary = {
     paid: "مدفوع",
     finished: "مكتمل",
     new: "جديد",
+    more: "المزيد",
+    signedInAs: "مسجّل الدخول باسم",
+    activityTypes: { character_generate: "رسم الشخصية", story_generate: "كتابة القصة", book_production: "الرسومات النهائية", pdf_render: "تجليد ملف PDF" },
+    jobStatus: { queued: "في الانتظار", processing: "قيد التنفيذ", completed: "تم", failed: "يحتاج انتباهك", cancelled: "أُلغي" },
+    untitled: "قصة بلا عنوان",
+    childAge: (x: number) => `${n(x)} سنوات`,
   },
   designSystem: {
     title: "نظام تصميم ستوريلنج",

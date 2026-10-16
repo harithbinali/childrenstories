@@ -202,6 +202,12 @@ const en = {
     paid: "Paid",
     finished: "Finished",
     new: "New",
+    more: "More",
+    signedInAs: "Signed in as",
+    activityTypes: { character_generate: "Character drawing", story_generate: "Story writing", book_production: "Final illustrations", pdf_render: "PDF binding" } as Record<string, string>,
+    jobStatus: { queued: "Waiting", processing: "In progress", completed: "Done", failed: "Needs attention", cancelled: "Cancelled" } as Record<string, string>,
+    untitled: "Untitled story",
+    childAge: (n: number) => `${n} years old`,
   },
   designSystem: {
     title: "Storyling design system",

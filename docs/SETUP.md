@@ -28,11 +28,11 @@ privilege escalation, duplicate webhooks, refunds and job-queue recovery.
 2. Apply migrations: `npx supabase link --project-ref <ref>` then `npx supabase db push`
    (or run the files in `supabase/migrations/` in order in the SQL editor).
 3. Auth > Providers: enable Email (confirm email ON). Optional: Google.
-4. Auth > URL configuration: Site URL = your domain; add the `/auth/callback` redirect
-   (route ships with the authentication UI — pending, see IMPLEMENTATION_CHECKLIST.md).
+4. Auth > URL configuration: Site URL = your domain; add `https://<domain>/api/auth/callback`
+   (and `http://localhost:3000/api/auth/callback` for development) to the redirect URLs.
 5. Make yourself admin (SQL editor):
    `insert into user_roles (user_id, role) select id, 'admin' from auth.users where email = 'you@example.com';`
-6. Admin > Products: confirm prices (seeded values are placeholders).
+6. Prices are seeded as USD 19 / 24 / 29 (confirmed); edit in Admin > Products.
 7. Admin > AI Configuration: enter current OpenAI prices so cost reports are populated.
 
 ## 3. OpenAI
