@@ -192,3 +192,12 @@ describe("generation job queue", () => {
     expect(j).toEqual({ status: "queued", max_attempts: 2 });
   });
 });
+
+describe("rate limiting", () => {
+  it("allows up to the limit within a window", async () => {
+    const results: boolean[] = [];
+    for (let i = 0; i < 4; i++) results.push((await pool.query(`select hit_rate_limit('upload:u1', 3, 3600) ok`)).rows[0].ok);
+    expect(results).toEqual([true, true, true, false]);
+    expect((await pool.query(`select hit_rate_limit('upload:u2', 3, 3600) ok`)).rows[0].ok).toBe(true);
+  });
+});
