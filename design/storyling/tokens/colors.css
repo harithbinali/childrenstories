@@ -1,0 +1,32 @@
+:root{
+/* Ink — storybook navy, used for all text and outlines */
+--ink-900:#1B2457;--ink-800:#26306B;--ink-700:#3A4580;--ink-500:#5E6798;--ink-400:#8A92BC;--ink-300:#B4BAD8;--ink-200:#D6DAEE;--ink-100:#E9EBF6;
+/* Paper — warm page whites */
+--white:#FFFFFF;--paper:#FFFBF2;--paper-2:#FFF4E0;--paper-3:#FCEACB;
+/* Sky blue — primary brand */
+--blue-50:#EEF5FF;--blue-100:#DCEBFF;--blue-200:#B7D5FF;--blue-400:#4F93F5;--blue-500:#2F7DF0;--blue-600:#1F64D6;--blue-700:#1748A8;--blue-800:#123681;
+/* Sunshine yellow — CTAs, stars, highlights */
+--sun-100:#FFF3C8;--sun-200:#FFE58A;--sun-400:#FFC93C;--sun-500:#FFB80F;--sun-600:#E09600;--sun-700:#A86C00;
+/* Cherry red */
+--cherry-100:#FFE1E2;--cherry-400:#F65D65;--cherry-500:#EB3540;--cherry-600:#C7202C;
+/* Bubblegum pink */
+--bubble-100:#FFE4F0;--bubble-400:#FF8DBF;--bubble-500:#FF6AAA;--bubble-600:#DE4589;
+/* Mint green */
+--mint-100:#DDF6E8;--mint-400:#5ED6A0;--mint-500:#34C185;--mint-600:#1E9C68;
+/* Tangerine */
+--tangerine-100:#FFE7D3;--tangerine-400:#FFA261;--tangerine-500:#FF8838;--tangerine-600:#E06A17;
+/* Grape */
+--grape-100:#ECE5FF;--grape-400:#A58BFF;--grape-500:#8B6CF0;--grape-600:#6E4ED6;
+/* Night — bedtime-mode surfaces */
+--night-950:#0E1438;--night-900:#151D4C;--night-800:#1F2964;--night-700:#2D3980;
+
+/* Semantic aliases */
+--text-strong:var(--ink-900);--text-body:var(--ink-700);--text-muted:var(--ink-500);--text-faint:var(--ink-400);--text-on-brand:var(--white);--text-on-sun:var(--ink-900);--text-link:var(--blue-600);
+--surface-page:var(--paper);--surface-card:var(--white);--surface-sunken:var(--paper-2);--surface-sky:var(--blue-500);--surface-night:var(--night-900);--surface-overlay:rgba(21,29,76,.55);
+--brand-primary:var(--blue-500);--brand-primary-hover:var(--blue-600);--brand-primary-edge:var(--blue-700);
+--brand-accent:var(--sun-400);--brand-accent-hover:var(--sun-500);--brand-accent-edge:var(--sun-600);
+--border-soft:var(--ink-100);--border-default:var(--ink-200);--border-strong:var(--ink-900);--focus-ring:var(--blue-600);
+--success:var(--mint-500);--success-soft:var(--mint-100);--warning:var(--sun-500);--warning-soft:var(--sun-100);--danger:var(--cherry-500);--danger-soft:var(--cherry-100);--info:var(--blue-500);--info-soft:var(--blue-100);
+/* Pastel card tints, in rotation order */
+--tint-sun:var(--sun-100);--tint-sky:var(--blue-100);--tint-bubble:var(--bubble-100);--tint-mint:var(--mint-100);--tint-grape:var(--grape-100);--tint-tangerine:var(--tangerine-100);
+}

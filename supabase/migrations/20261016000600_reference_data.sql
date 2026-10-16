@@ -37,7 +37,7 @@ insert into public.story_themes (slug, name_en, name_ar, prompt_guidance, is_cus
   ('custom',              'Custom Story',        'قصة مخصّصة',       'Follow the parent''s idea closely while keeping it age-appropriate.', true, false, 14)
 on conflict (slug) do nothing;
 
--- PLACEHOLDER PRICES: confirm and edit in Admin > Products and Pricing before launch.
+-- Launch prices confirmed by the owner (USD 19 / 24 / 29). Editable in Admin > Products and Pricing.
 insert into public.book_products (sku, name_en, name_ar, page_count, price_amount, currency, free_preview_pages, included_regenerations, sort_order) values
   ('book-8-usd',  '8-page storybook',  'كتاب من 8 صفحات',  8,  1900, 'USD', 2, 8,  1),
   ('book-12-usd', '12-page storybook', 'كتاب من 12 صفحة', 12, 2400, 'USD', 2, 12, 2),

@@ -1,0 +1,4 @@
+/* Phosphor Icons (CDN) — fill, bold and duotone weights. Usage: <i class="ph-fill ph-star"></i> */
+@import url("https://unpkg.com/@phosphor-icons/web@2.1.1/src/fill/style.css");
+@import url("https://unpkg.com/@phosphor-icons/web@2.1.1/src/bold/style.css");
+@import url("https://unpkg.com/@phosphor-icons/web@2.1.1/src/duotone/style.css");
