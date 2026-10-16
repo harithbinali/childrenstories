@@ -4,6 +4,7 @@ import type { Overview } from "@/lib/dashboard/overview";
 import type { ChildDetail, ChildSummary } from "@/lib/children/queries";
 import type { CharacterDetail } from "@/lib/characters/queries";
 import type { BookWorkspace, CreatorData } from "@/lib/books/queries";
+import type { ReaderBook } from "@/lib/books/reader";
 
 /**
  * INTERNAL PREVIEW DATA for /design-system/preview/* only — lets designers
@@ -119,5 +120,19 @@ export function previewWorkspace(locale: Locale, status: string, orientation: "p
     jobs: { active: status === "producing" ? 4 : 0, storyRunning: false, rewritingPages: status === "story_ready" ? [3] : [], illustratingPages: [], finalDone: status === "producing" ? 6 : 10, finalTotal: 10, pdfRunning: false, lastError: null },
     usage: { textRedrawsUsed: 1, imageRedrawsUsed: 2, included: 8, previewsUsed: 2 },
     price: { amount: 1900, currency: "USD" }, gateways: ["stripe", "paypal"], order: null, readingPage: status === "completed" ? 3 : 0,
+  };
+}
+
+/** A finished book for the reader preview; illustrations fall back to the page placeholder art. */
+export function previewReaderBook(locale: Locale, orientation: "portrait" | "landscape" = "portrait", startIndex = 0): ReaderBook {
+  const w = previewWorkspace(locale, "completed", orientation);
+  return {
+    id: w.id, title: w.title ?? "", language: w.language, orientation, ageRange: w.ageRange, startIndex,
+    pages: [
+      { kind: "front_cover", imageUrl: null, pageNumber: null },
+      { kind: "dedication", text: w.dedication ?? "", imageUrl: null, pageNumber: null },
+      ...w.pages.map((p) => ({ kind: "story" as const, text: p.text, textPosition: p.textPosition, imageUrl: null, imageAlt: "", pageNumber: p.number })),
+      { kind: "back_cover", imageUrl: null, pageNumber: null },
+    ],
   };
 }

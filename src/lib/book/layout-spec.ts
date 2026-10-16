@@ -109,13 +109,17 @@ export function buildPageSequence(pageCount: number, hasDedication: boolean): Se
 }
 
 /**
- * Two-page spreads for wide screens: the cover stands alone (as in a printed
- * book), then pages pair up. For RTL books the pair is displayed right-to-left.
+ * Two-page spreads for wide screens: both covers stand alone (as in a printed
+ * book), the inside pages pair up. For RTL books each pair is ordered
+ * right-to-left, i.e. the returned order is the on-screen left-to-right order.
  */
 export function buildSpreads(sequence: SequencedPage[], language: Language): SequencedPage[][] {
-  const [cover, ...rest] = sequence;
+  const cover = sequence[0];
+  const back = sequence.at(-1)!;
+  const inside = sequence.slice(1, -1);
   const spreads: SequencedPage[][] = [[cover]];
-  for (let i = 0; i < rest.length; i += 2) spreads.push(rest.slice(i, i + 2));
+  for (let i = 0; i < inside.length; i += 2) spreads.push(inside.slice(i, i + 2));
+  spreads.push([back]);
   return language === "ar" ? spreads.map((s) => [...s].reverse()) : spreads;
 }
 

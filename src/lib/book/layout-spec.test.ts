@@ -22,7 +22,7 @@ describe("layout spec", () => {
     expect(() => buildPageSequence(10, false)).toThrow();
   });
 
-  it("spreads keep the cover alone and mirror order for Arabic", () => {
+  it("spreads keep both covers alone and mirror order for Arabic", () => {
     const seq = buildPageSequence(8, false); // cover + 8 + back = 10
     const en = buildSpreads(seq, "en");
     expect(en[0].map((p) => p.kind)).toEqual(["front_cover"]);
@@ -30,6 +30,13 @@ describe("layout spec", () => {
     const ar = buildSpreads(seq, "ar");
     expect(ar[1].map((p) => p.storyPageNumber)).toEqual([2, 1]);
     expect(en.flat()).toHaveLength(seq.length);
+    expect(en.at(-1)!.map((p) => p.kind)).toEqual(["back_cover"]);
+    expect(en.at(-2)!.map((p) => p.storyPageNumber)).toEqual([7, 8]);
+    // With a dedication the last story page is left on its own before the back cover.
+    const withDed = buildSpreads(buildPageSequence(8, true), "en");
+    expect(withDed[1].map((p) => p.kind)).toEqual(["dedication", "story"]);
+    expect(withDed.at(-2)!.map((p) => p.storyPageNumber)).toEqual([8]);
+    expect(withDed.at(-1)!.map((p) => p.kind)).toEqual(["back_cover"]);
   });
 
   it("start/end text columns mirror in RTL and stay inside the page", () => {

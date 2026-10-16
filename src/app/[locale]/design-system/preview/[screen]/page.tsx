@@ -14,7 +14,9 @@ import { CreateWizard } from "@/components/creator/CreateWizard";
 import { wizardLabels } from "@/components/creator/labels";
 import { BookWorkspaceView } from "@/components/book-workspace/BookWorkspaceView";
 import { PageBody, PageHeader } from "@/components/dashboard/ui/PageHeader";
-import { previewCatalog, previewCharacter, previewChildDetail, previewChildren, previewCreatorData, previewWorkspace } from "@/lib/preview-fixtures";
+import { Reader } from "@/components/reader/Reader";
+import { readerLabels } from "@/components/reader/labels";
+import { previewReaderBook, previewCatalog, previewCharacter, previewChildDetail, previewChildren, previewCreatorData, previewWorkspace } from "@/lib/preview-fixtures";
 import { isLocale, type Locale } from "@/i18n/config";
 import { getDictionary, type Dictionary } from "@/i18n/dictionaries";
 import { Gate } from "../../gate";
@@ -44,15 +46,27 @@ const SCREENS: Record<string, (d: Dictionary, l: Locale) => ReactNode> = {
   "book-completed": (d, l) => <BookWorkspaceView d={d} locale={l} b={previewWorkspace(l, "completed")} />,
 };
 
+/** Full-screen screens that render without the dashboard shell. */
+const reader = (d: Dictionary, l: Locale, o: "portrait" | "landscape", start = 0) => {
+  const book = previewReaderBook(l, o, start);
+  return <Reader book={book} labels={readerLabels(d, book)} backHref="/design-system" persistProgress={false} />;
+};
+const BARE: Record<string, (d: Dictionary, l: Locale) => ReactNode> = {
+  reader: (d, l) => reader(d, l, "portrait", 2),
+  "reader-cover": (d, l) => reader(d, l, "portrait"),
+  "reader-landscape": (d, l) => reader(d, l, "landscape", 3),
+};
+
 export function generateStaticParams() {
-  return Object.keys(SCREENS).map((screen) => ({ screen }));
+  return [...Object.keys(SCREENS), ...Object.keys(BARE)].map((screen) => ({ screen }));
 }
 
 async function Screen({ params, locale }: { params: Promise<{ screen: string }>; locale: Locale }) {
   const { screen } = await params;
+  const d = getDictionary(locale);
+  if (BARE[screen]) return BARE[screen](d, locale);
   const render = SCREENS[screen];
   if (!render) notFound();
-  const d = getDictionary(locale);
   return (
     <AppShell brand={<Wordmark name={d.brand} />} nav={dashboardNav(d, false)} mobilePrimary={MOBILE_PRIMARY} moreLabel={d.dashboard.more}
       sidebarFooter={<AccountCard d={d} locale={locale} name="Hana" email="hana@example.com" />}>
