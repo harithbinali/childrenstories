@@ -82,7 +82,8 @@ const en = {
     pricingStoryPages: "story pages",
     pricingExtras: "Plus front cover, back cover and an optional dedication page.",
     pricingCta: "Start this book",
-    pricingPopular: "Most loved",
+    pricingBestValue: "Best value",
+    pricingPerPage: (price: string) => `${price} per page`,
     pricingUnavailable: "Prices will appear here shortly.",
     faqTitle: "Questions from grown-ups",
     faqs: [
@@ -120,6 +121,7 @@ const en = {
     displayNamePlaceholder: "Hana",
     preferredLanguage: "Preferred language",
     terms: "I agree to the Terms of Service and Privacy Policy.",
+    termsLink: "Read the terms (opens in a new tab)",
     loginCta: "Log in",
     registerCta: "Create account",
     google: "Continue with Google",

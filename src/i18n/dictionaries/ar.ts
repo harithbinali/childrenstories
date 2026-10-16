@@ -82,7 +82,8 @@ const ar: Dictionary = {
     pricingStoryPages: "صفحة قصة",
     pricingExtras: "بالإضافة إلى الغلاف الأمامي والخلفي وصفحة إهداء اختيارية.",
     pricingCta: "ابدأ هذا الكتاب",
-    pricingPopular: "الأكثر حباً",
+    pricingBestValue: "أفضل قيمة",
+    pricingPerPage: (price: string) => `${price} للصفحة`,
     pricingUnavailable: "ستظهر الأسعار هنا قريباً.",
     faqTitle: "أسئلة الكبار",
     faqs: [
@@ -120,6 +121,7 @@ const ar: Dictionary = {
     displayNamePlaceholder: "هناء",
     preferredLanguage: "اللغة المفضلة",
     terms: "أوافق على شروط الخدمة وسياسة الخصوصية.",
+    termsLink: "اقرأ الشروط (تفتح في علامة تبويب جديدة)",
     loginCta: "تسجيل الدخول",
     registerCta: "إنشاء الحساب",
     google: "المتابعة باستخدام Google",

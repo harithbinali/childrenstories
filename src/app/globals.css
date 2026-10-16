@@ -11,3 +11,8 @@
 
 body { overflow-x: hidden; }
 .sl-wrap { max-width: var(--content-max); margin: 0 auto; padding-inline: var(--gutter); }
+
+/* FAQ disclosure (details/summary styled as Storyling cards) */
+.sl-faq summary::-webkit-details-marker { display: none; }
+.sl-faq__caret { transition: transform var(--dur-base) var(--ease-bounce); }
+.sl-faq[open] .sl-faq__caret { transform: rotate(180deg); }

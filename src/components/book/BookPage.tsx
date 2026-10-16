@@ -1,4 +1,4 @@
-import type { CSSProperties } from "react";
+import type { CSSProperties, ReactNode } from "react";
 import { storyTypography, textRegion, type AgeRange, type Language, type Orientation, type TextPosition } from "@/lib/book/layout-spec";
 
 /**
@@ -26,6 +26,8 @@ export type BookPageProps = {
   subtitle?: string;
   pageNumber?: number | null;
   imageAlt?: string;
+  /** Rendered in place of imageUrl (e.g. illustration placeholders on marketing samples). */
+  art?: ReactNode;
 };
 
 const TRIM_WIDTH_PT = { portrait: 576, landscape: 864 } as const;
@@ -52,7 +54,9 @@ export function BookPage(p: BookPageProps) {
     fontFamily,
   };
 
-  const art = p.imageUrl ? (
+  const art = p.art ? (
+    <div style={{ position: "absolute", inset: 0 }}>{p.art}</div>
+  ) : p.imageUrl ? (
     // eslint-disable-next-line @next/next/no-img-element -- shared with PDF rendering; next/image is unavailable there
     <img src={p.imageUrl} alt={p.imageAlt ?? ""} style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "contain" }} />
   ) : null;

@@ -7,10 +7,10 @@ import {
   SpeechBubble, Stepper, StoryCard, Switch, Tooltip, WaveDivider,
 } from "@/components/storyling";
 import { BookPage } from "@/components/book/BookPage";
-import { getSessionUser, isStaff } from "@/lib/auth/guards";
 import { isLocale } from "@/i18n/config";
 import { getDictionary } from "@/i18n/dictionaries";
 import { InteractiveDemos } from "./Interactive";
+import { Gate } from "./gate";
 
 export const metadata: Metadata = { title: "Design system", robots: { index: false, follow: false } };
 
@@ -26,15 +26,6 @@ const SCALES: Array<[string, string[]]> = [
   ["grape", ["100", "400", "500", "600"]],
   ["night", ["950", "900", "800", "700"]],
 ];
-
-/** Internal route: open in development; in production staff only (or when features.design_system_public is on). */
-async function Gate({ children }: { children: ReactNode }) {
-  if (process.env.NODE_ENV === "production" && process.env.DESIGN_SYSTEM_PUBLIC !== "true") {
-    const user = await getSessionUser().catch(() => null);
-    if (!isStaff(user)) notFound();
-  }
-  return <>{children}</>;
-}
 
 function Section({ title, children, id }: { title: string; id: string; children: ReactNode }) {
   return (
