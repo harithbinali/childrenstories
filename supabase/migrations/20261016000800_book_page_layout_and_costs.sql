@@ -27,3 +27,8 @@ revoke execute on function public.add_book_cost(uuid, numeric) from public, anon
 revoke execute on function public.increment_book_counter(uuid, text) from public, anon, authenticated;
 grant execute on function public.add_book_cost(uuid, numeric) to service_role;
 grant execute on function public.increment_book_counter(uuid, text) to service_role;
+
+-- The newest generated reference (shown for review); approved_reference_id is
+-- what story illustrations use.
+alter table public.characters
+  add column latest_reference_id uuid references public.character_references(id) on delete set null;

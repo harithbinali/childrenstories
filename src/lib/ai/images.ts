@@ -118,6 +118,8 @@ export async function generateSceneIllustration(
     language: Language;
     quality: QualityTier;
     kind: "page" | "front_cover" | "back_cover";
+    /** Approved preview of this page: the final render keeps its composition. */
+    compositionReference?: InputImage | null;
   },
   ctx: AiContext,
 ): Promise<{ image: Uint8Array; prompt: string; model: string; size: string; costUsd: number | null }> {
@@ -136,15 +138,20 @@ export async function generateSceneIllustration(
     `Scene: ${args.scenePrompt}`,
     args.stylePrompt,
     composition,
+    args.compositionReference
+      ? `The second reference image is the approved draft of this exact page: keep its composition, camera angle, poses and layout, re-rendered with more detail and polish.`
+      : null,
     `Absolutely no text, letters, numbers, captions, signs, logos or speech bubbles anywhere in the image. Wholesome, gentle, child-friendly.`,
-  ].join("\n");
+  ]
+    .filter(Boolean)
+    .join("\n");
 
   const { result, costUsd } = await runAI("image", `images.edit:${args.kind}`, ctx, async (client, setting, { signal, safetyId }) => {
     const quality = (setting.params[args.quality === "final" ? "final_quality" : "preview_quality"] as string) ?? "medium";
     const res = await client.images.edit(
       {
         model: setting.model,
-        image: await asUploads([args.reference]),
+        image: await asUploads(args.compositionReference ? [args.reference, args.compositionReference] : [args.reference]),
         prompt,
         size,
         quality: quality as "low" | "medium" | "high",
