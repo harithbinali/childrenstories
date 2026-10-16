@@ -201,3 +201,28 @@ describe("rate limiting", () => {
     expect((await pool.query(`select hit_rate_limit('upload:u2', 3, 3600) ok`)).rows[0].ok).toBe(true);
   });
 });
+
+describe("superseded checkouts", () => {
+  it("honours a payment completed on an abandoned checkout and cancels the newer unpaid one", async () => {
+    const { book, order: oldOrder } = await newPendingOrder();
+    await pool.query(`update orders set status = 'cancelled' where id = $1`, [oldOrder]);
+    const newOrder = (await pool.query(`insert into orders (owner_id, book_id, currency, subtotal_amount, total_amount) values ($1, $2, 'USD', 2400, 2400) returning id`, [parent, book])).rows[0].id;
+
+    const r = (await pool.query(`select mark_order_paid($1, 'stripe', 'pi_old_tab', 2400, 'USD') r`, [oldOrder])).rows[0].r;
+    expect(r.already_paid).toBe(false);
+    const statuses = (await pool.query(`select id, status::text from orders where book_id = $1`, [book])).rows;
+    expect(Object.fromEntries(statuses.map((s) => [s.id, s.status]))).toEqual({ [oldOrder]: "paid", [newOrder]: "cancelled" });
+  });
+
+  it("flags a second payment for an already-paid book instead of failing forever", async () => {
+    const { book, order: first } = await newPendingOrder();
+    await pool.query(`update orders set status = 'cancelled' where id = $1`, [first]);
+    const second = (await pool.query(`insert into orders (owner_id, book_id, currency, subtotal_amount, total_amount) values ($1, $2, 'USD', 2400, 2400) returning id`, [parent, book])).rows[0].id;
+    await pool.query(`select mark_order_paid($1, 'stripe', 'pi_second', 2400, 'USD')`, [second]);
+
+    const r = (await pool.query(`select mark_order_paid($1, 'stripe', 'pi_first_late', 2400, 'USD') r`, [first])).rows[0].r;
+    expect(r.error).toBe("duplicate_payment_requires_refund");
+    const p = (await pool.query(`select status::text from payments where gateway_payment_id = 'pi_first_late'`)).rows[0];
+    expect(p.status).toBe("paid"); // captured money is recorded so staff can refund it
+  });
+});

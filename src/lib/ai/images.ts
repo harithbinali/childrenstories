@@ -22,13 +22,8 @@ function decodeImage(res: { data?: Array<{ b64_json?: string | null }> | null })
 
 export const CHARACTER_IDENTITY_RULES = `Preserve the child's recognisable identity exactly: facial structure and face shape, skin tone, hair colour, hairstyle and hair texture, eye colour and eye shape, eyebrows, and any distinctive features such as freckles, dimples or glasses. Keep realistic, age-appropriate child proportions — do not age the child up, slim, lighten or darken their skin, or change their ethnicity. Wholesome, fully clothed, friendly expression.`;
 
-/** Photo(s) of the child -> illustrated character reference sheet. */
-export async function generateCharacterReference(
-  args: { photos: InputImage[]; stylePrompt: string; corrections?: string | null; quality: QualityTier; appearanceNotes?: string | null },
-  ctx: AiContext,
-): Promise<{ image: Uint8Array; prompt: string; model: string; size: string; costUsd: number | null }> {
-  const size = "1024x1536";
-  const prompt = [
+export function buildCharacterPrompt(args: { stylePrompt: string; corrections?: string | null; appearanceNotes?: string | null }): string {
+  return [
     `Transform the child in the reference photo(s) into an illustrated storybook character.`,
     args.stylePrompt,
     CHARACTER_IDENTITY_RULES,
@@ -38,6 +33,15 @@ export async function generateCharacterReference(
   ]
     .filter(Boolean)
     .join("\n");
+}
+
+/** Photo(s) of the child -> illustrated character reference sheet. */
+export async function generateCharacterReference(
+  args: { photos: InputImage[]; stylePrompt: string; corrections?: string | null; quality: QualityTier; appearanceNotes?: string | null },
+  ctx: AiContext,
+): Promise<{ image: Uint8Array; prompt: string; model: string; size: string; costUsd: number | null }> {
+  const size = "1024x1536";
+  const prompt = buildCharacterPrompt(args);
 
   const { result, costUsd } = await runAI("image", "images.edit:character", ctx, async (client, setting, { signal, safetyId }) => {
     const quality = (setting.params[args.quality === "final" ? "final_quality" : "preview_quality"] as string) ?? "medium";
@@ -105,6 +109,43 @@ export async function describeCharacter(reference: InputImage, ctx: AiContext): 
   return result;
 }
 
+export type SceneArgs = {
+  characterDescription: string;
+  wardrobe: string;
+  stylePrompt: string;
+  scenePrompt: string;
+  orientation: Orientation;
+  textPosition: TextPosition | null; // null for covers (title is typeset separately)
+  language: Language;
+  kind: "page" | "front_cover" | "back_cover";
+  hasCompositionReference?: boolean;
+};
+
+export function buildScenePrompt(args: SceneArgs & { compositionReference?: InputImage | null }): string {
+  const composition =
+    args.kind === "front_cover"
+      ? "Cover composition: the hero is the clear focal point in the lower two-thirds; keep the top third calm and simple because the book title will be typeset there."
+      : args.kind === "back_cover"
+        ? "Back cover composition: a quiet, simple closing vignette with plenty of calm space."
+        : compositionInstruction(args.orientation, args.textPosition ?? "bottom", args.language);
+
+  return [
+    `Children's picture-book illustration (${args.orientation}).`,
+    `The hero is EXACTLY the same child character shown in the reference image — identical face, skin tone, hair, eyes and proportions. Character notes: ${args.characterDescription}`,
+    `Outfit (keep identical unless the scene says otherwise): ${args.wardrobe}`,
+    `Scene: ${args.scenePrompt}`,
+    args.stylePrompt,
+    composition,
+    (args.hasCompositionReference || args.compositionReference)
+      ? `The second reference image is the approved draft of this exact page: keep its composition, camera angle, poses and layout, re-rendered with more detail and polish.`
+      : null,
+    `Absolutely no text, letters, numbers, captions, signs, logos or speech bubbles anywhere in the image. Wholesome, gentle, child-friendly.`,
+  ]
+    .filter(Boolean)
+    .join("\n");
+}
+
+
 /** A story page / cover illustration of the approved character. */
 export async function generateSceneIllustration(
   args: {
@@ -124,27 +165,7 @@ export async function generateSceneIllustration(
   ctx: AiContext,
 ): Promise<{ image: Uint8Array; prompt: string; model: string; size: string; costUsd: number | null }> {
   const size = IMAGE_SIZE[args.orientation];
-  const composition =
-    args.kind === "front_cover"
-      ? "Cover composition: the hero is the clear focal point in the lower two-thirds; keep the top third calm and simple because the book title will be typeset there."
-      : args.kind === "back_cover"
-        ? "Back cover composition: a quiet, simple closing vignette with plenty of calm space."
-        : compositionInstruction(args.orientation, args.textPosition ?? "bottom", args.language);
-
-  const prompt = [
-    `Children's picture-book illustration (${args.orientation}).`,
-    `The hero is EXACTLY the same child character shown in the reference image — identical face, skin tone, hair, eyes and proportions. Character notes: ${args.characterDescription}`,
-    `Outfit (keep identical unless the scene says otherwise): ${args.wardrobe}`,
-    `Scene: ${args.scenePrompt}`,
-    args.stylePrompt,
-    composition,
-    args.compositionReference
-      ? `The second reference image is the approved draft of this exact page: keep its composition, camera angle, poses and layout, re-rendered with more detail and polish.`
-      : null,
-    `Absolutely no text, letters, numbers, captions, signs, logos or speech bubbles anywhere in the image. Wholesome, gentle, child-friendly.`,
-  ]
-    .filter(Boolean)
-    .join("\n");
+  const prompt = buildScenePrompt(args);
 
   const { result, costUsd } = await runAI("image", `images.edit:${args.kind}`, ctx, async (client, setting, { signal, safetyId }) => {
     const quality = (setting.params[args.quality === "final" ? "final_quality" : "preview_quality"] as string) ?? "medium";
