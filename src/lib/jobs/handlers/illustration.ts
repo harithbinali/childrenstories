@@ -5,6 +5,7 @@ import { generateSceneIllustration, type InputImage } from "@/lib/ai/images";
 import { loadBookBundle, type BookBundle } from "@/lib/book/load";
 import { getObject, paths, putObject } from "@/lib/storage";
 import { enqueueJob } from "../enqueue";
+import { pdfJobKey } from "../keys";
 import { PermanentJobError, type JobHandler } from "../types";
 
 type Kind = "page" | "front_cover" | "back_cover";
@@ -118,11 +119,13 @@ export async function enqueuePdfIfIllustrated(bookId: string, ownerId: string, b
   const have = new Set((data ?? []).map((r) => (r.kind === "page" ? `p${r.page_number}` : r.kind)));
   const needed = ["front_cover", "back_cover", ...bundle.pages.map((p) => `p${p.page_number}`)];
   if (!needed.every((k) => have.has(k)) || !bundle.version) return false;
+  // Redraw count is part of the key so a redrawn page produces a fresh PDF.
+  const { data: row } = await db.from("books").select("image_regenerations_used").eq("id", bookId).single();
   await enqueueJob({
     type: "pdf_render",
     ownerId,
     bookId,
-    idempotencyKey: `pdf:${bookId}:v${bundle.version.version_number}`,
+    idempotencyKey: pdfJobKey(bookId, bundle.version.version_number, row?.image_regenerations_used ?? 0),
     priority: 10,
     maxAttempts: 5,
   });

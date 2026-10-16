@@ -32,6 +32,7 @@ export type UsageSnapshot = {
 
 export type GenerationRequest =
   | { kind: "character" }
+  | { kind: "new_book" }
   | { kind: "story" }
   | { kind: "page_rewrite" }
   | { kind: "preview_illustration" }
@@ -64,6 +65,8 @@ export function evaluateLimits(s: LimitSettings, u: UsageSnapshot, r: Generation
   if (!IMAGE_KINDS.has(r.kind) && u.textJobsLast24h >= s.dailyTextGenerationsPerUser) return deny("daily_text_limit");
 
   switch (r.kind) {
+    case "new_book":
+      return { allowed: true }; // only the shared daily / concurrency / spend caps apply
     case "character":
       return u.hasPaidOrder || u.characterGenerationsTotal < s.freeCharacterAttempts ? { allowed: true } : deny("free_character_attempts_used");
     case "story":

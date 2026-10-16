@@ -58,6 +58,13 @@ async function onJobFailedPermanently(job: JobRow, message: string) {
   if (job.type === "story_generate" && job.book_id) {
     await db.from("books").update({ status: "failed" }).eq("id", job.book_id).eq("status", "story_generating");
   }
+  // A preview picture that can't be drawn shouldn't block the book: show the
+  // preview with that slot empty (the parent can redraw it).
+  if ((job.type === "page_illustration" || job.type === "cover_illustration") && job.book_id && job.payload.quality === "preview") {
+    const { count } = await db.from("generation_jobs").select("id", { count: "exact", head: true })
+      .eq("book_id", job.book_id).in("type", ["page_illustration", "cover_illustration"]).in("status", ["queued", "processing"]);
+    if (!count) await db.from("books").update({ status: "preview_ready" }).eq("id", job.book_id).eq("status", "illustrating");
+  }
   console.error(`[jobs] permanently failed ${job.type} ${job.id}: ${message}`);
 }
 

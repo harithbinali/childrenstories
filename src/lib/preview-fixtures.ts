@@ -3,6 +3,7 @@ import type { Locale } from "@/i18n/config";
 import type { Overview } from "@/lib/dashboard/overview";
 import type { ChildDetail, ChildSummary } from "@/lib/children/queries";
 import type { CharacterDetail } from "@/lib/characters/queries";
+import type { BookWorkspace, CreatorData } from "@/lib/books/queries";
 
 /**
  * INTERNAL PREVIEW DATA for /design-system/preview/* only — lets designers
@@ -91,5 +92,32 @@ export function previewCharacter(locale: Locale, status: "generating" | "ready" 
     approvedReferenceId: status === "approved" ? "r2" : null, latestReferenceId: "r2",
     references: status === "generating" ? [{ id: "r1", url: null, createdAt: "2026-10-15T10:00:00Z" }] : [{ id: "r2", url: null, createdAt: "2026-10-15T11:00:00Z" }, { id: "r1", url: null, createdAt: "2026-10-15T10:00:00Z" }],
     job: status === "generating" ? { status: "processing", stage: "drawing_character", progress: 45, error: null } : null,
+  };
+}
+
+export function previewCreatorData(locale: Locale): CreatorData {
+  const ar = locale === "ar";
+  return {
+    children: [
+      { id: "k1", name: ar ? "ليلى" : "Layla", ageYears: 6, preferredLanguage: locale, characters: [{ id: "c1", name: ar ? "ليلى" : "Layla", imageUrl: null }, { id: "c2", name: ar ? "ليلى الفضائية" : "Space Layla", imageUrl: null }] },
+      { id: "k2", name: ar ? "عمر" : "Omar", ageYears: 4, preferredLanguage: locale, characters: [] },
+    ],
+  };
+}
+
+export function previewWorkspace(locale: Locale, status: string, orientation: "portrait" | "landscape" = "portrait"): BookWorkspace {
+  const ar = locale === "ar";
+  const texts = ar
+    ? ["في ليلة مليئة بالنجوم، وجدت ليلى باباً صغيراً في آخر الحديقة.", "همست غيمة صغيرة ناعسة: «مرحباً، لقد ضللت طريقي إلى البيت.»", "أمسكت ليلى بيد الغيمة الناعمة وطارتا فوق المدينة النائمة.", "على قمة التلّ كانت النجوم تغنّي أغنية هادئة."]
+    : ["Once upon a starry night, Layla found a tiny door at the bottom of the garden.", "“Hello,” whispered a sleepy little cloud. “I've lost my way home.”", "Layla held the cloud's soft hand and they floated over the sleeping town.", "On top of the hill, the stars were humming a gentle song."];
+  const pages = Array.from({ length: 8 }, (_, i) => ({ number: i + 1, text: texts[i % 4], scene: "", textPosition: (orientation === "portrait" ? "bottom" : i % 2 ? "end" : "start") as "bottom", previewUrl: null, finalUrl: null }));
+  return {
+    id: "b1", title: ar ? "ليلى والغيمة الضائعة" : "Layla and the Lost Cloud", status, language: locale, ageRange: "3-5", pageCount: 8, orientation,
+    dedication: ar ? "إلى ليلى، مع كل الحب" : "For Layla, with all our love", isFavorite: status === "completed", entitled: ["producing", "completed"].includes(status),
+    pdfReady: status === "completed", childName: ar ? "ليلى" : "Layla", characterName: ar ? "ليلى" : "Layla", versionNumber: 2, pages,
+    cover: { previewUrl: null, finalUrl: null }, backCover: { finalUrl: null },
+    jobs: { active: status === "producing" ? 4 : 0, storyRunning: false, rewritingPages: status === "story_ready" ? [3] : [], illustratingPages: [], finalDone: status === "producing" ? 6 : 10, finalTotal: 10, pdfRunning: false, lastError: null },
+    usage: { textRedrawsUsed: 1, imageRedrawsUsed: 2, included: 8, previewsUsed: 2 },
+    price: { amount: 1900, currency: "USD" }, gateways: ["stripe", "paypal"], order: null, readingPage: status === "completed" ? 3 : 0,
   };
 }

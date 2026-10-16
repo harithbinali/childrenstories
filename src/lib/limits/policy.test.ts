@@ -34,6 +34,10 @@ describe("evaluateLimits", () => {
     expect(evaluateLimits(s, u({ activeJobs: 4 }), { kind: "story" })).toEqual({ allowed: false, code: "too_many_active_jobs" });
     expect(evaluateLimits(s, u({ platformSpendLast24hUsd: 100 }), { kind: "story" })).toEqual({ allowed: false, code: "platform_paused" });
   });
+  it("lets a new book start unless a shared cap is hit", () => {
+    expect(evaluateLimits(s, u({ book: undefined }), { kind: "new_book" })).toEqual({ allowed: true });
+    expect(evaluateLimits(s, u({ book: undefined, textJobsLast24h: 40 }), { kind: "new_book" })).toEqual({ allowed: false, code: "daily_text_limit" });
+  });
   it("never blocks fulfilment of a paid book, even when spend caps are hit", () => {
     expect(evaluateLimits(s, u({ platformSpendLast24hUsd: 9999, activeJobs: 99, book: { ...book, entitled: true } }), { kind: "paid_production" })).toEqual({ allowed: true });
     expect(evaluateLimits(s, u(), { kind: "paid_production" })).toEqual({ allowed: false, code: "purchase_required" });

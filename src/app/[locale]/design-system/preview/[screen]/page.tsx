@@ -10,7 +10,11 @@ import { ChildrenView } from "@/components/children/ChildrenView";
 import { ChildDetailView } from "@/components/children/ChildDetailView";
 import { CharacterStudioView } from "@/components/characters/CharacterStudioView";
 import { CharactersView } from "@/components/characters/CharactersView";
-import { previewCatalog, previewCharacter, previewChildDetail, previewChildren } from "@/lib/preview-fixtures";
+import { CreateWizard } from "@/components/creator/CreateWizard";
+import { wizardLabels } from "@/components/creator/labels";
+import { BookWorkspaceView } from "@/components/book-workspace/BookWorkspaceView";
+import { PageBody, PageHeader } from "@/components/dashboard/ui/PageHeader";
+import { previewCatalog, previewCharacter, previewChildDetail, previewChildren, previewCreatorData, previewWorkspace } from "@/lib/preview-fixtures";
 import { isLocale, type Locale } from "@/i18n/config";
 import { getDictionary, type Dictionary } from "@/i18n/dictionaries";
 import { Gate } from "../../gate";
@@ -25,6 +29,19 @@ const SCREENS: Record<string, (d: Dictionary, l: Locale) => ReactNode> = {
   "character-generating": (d, l) => <CharacterStudioView d={d} c={previewCharacter(l, "generating")} styles={previewCatalog(l).styles} />,
   "character-ready": (d, l) => <CharacterStudioView d={d} c={previewCharacter(l, "ready")} styles={previewCatalog(l).styles} />,
   "character-approved": (d, l) => <CharacterStudioView d={d} c={previewCharacter(l, "approved")} styles={previewCatalog(l).styles} />,
+  create: (d, l) => (
+    <PageBody>
+      <PageHeader title={d.creator.title} />
+      <CreateWizard data={previewCreatorData(l)} locale={l} errors={d.errors} labels={wizardLabels(d, l)} pageCounts={[8, 12, 16]} initial={{ childId: "k1", characterId: "c1" }}
+        themes={previewCatalog(l).themes.map((t) => ({ id: t.id, slug: t.slug, name: t.name, isCustom: t.isCustom }))} />
+    </PageBody>
+  ),
+  "book-writing": (d, l) => <BookWorkspaceView d={d} locale={l} b={previewWorkspace(l, "story_generating")} />,
+  "book-story": (d, l) => <BookWorkspaceView d={d} locale={l} b={previewWorkspace(l, "story_ready")} />,
+  "book-preview": (d, l) => <BookWorkspaceView d={d} locale={l} b={previewWorkspace(l, "preview_ready")} />,
+  "book-preview-landscape": (d, l) => <BookWorkspaceView d={d} locale={l} b={previewWorkspace(l, "preview_ready", "landscape")} />,
+  "book-producing": (d, l) => <BookWorkspaceView d={d} locale={l} b={previewWorkspace(l, "producing")} />,
+  "book-completed": (d, l) => <BookWorkspaceView d={d} locale={l} b={previewWorkspace(l, "completed")} />,
 };
 
 export function generateStaticParams() {

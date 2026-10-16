@@ -71,7 +71,7 @@ export async function loadUsage(userId: string, bookId?: string): Promise<UsageS
     if (error || !book || book.owner_id !== userId) throw new Error("book not found");
     const [stories, previews, entitled] = await Promise.all([
       count(db.from("generation_jobs").select("id", { count: "exact", head: true }).eq("book_id", bookId).eq("type", "story_generate")),
-      count(db.from("generated_illustrations").select("id", { count: "exact", head: true }).eq("book_id", bookId).eq("quality_tier", "preview")),
+      count(db.from("generated_illustrations").select("id", { count: "exact", head: true }).eq("book_id", bookId).eq("quality_tier", "preview").eq("kind", "page")),
       db.rpc("has_book_entitlement", { p_book_id: bookId, p_user: userId }),
     ]);
     const product = book.book_products as unknown as { included_regenerations: number } | null;
