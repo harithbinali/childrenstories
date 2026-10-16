@@ -14,7 +14,7 @@ type P = { d: Dictionary; locale: Locale };
 const TINTS = ["sun", "sky", "bubble", "mint", "grape", "tangerine"] as const;
 const INK = ["var(--sun-500)", "var(--blue-500)", "var(--bubble-500)", "var(--mint-500)", "var(--grape-500)", "var(--tangerine-500)"];
 
-function SectionTitle({ children, sub, center = true, light }: { children: ReactNode; sub?: ReactNode; center?: boolean; light?: boolean }) {
+export function SectionTitle({ children, sub, center = true, light }: { children: ReactNode; sub?: ReactNode; center?: boolean; light?: boolean }) {
   return (
     <div style={{ textAlign: center ? "center" : "start", marginBottom: 48, display: "grid", gap: 10, justifyItems: center ? "center" : "start" }}>
       <h2 style={{ font: "var(--type-h1)", color: light ? "#fff" : undefined }}>{children}</h2>
@@ -108,15 +108,15 @@ export function Transformation({ d }: P) {
   );
 }
 
-export function Themes({ d, catalog }: P & { catalog: Catalog | null }) {
+export function Themes({ d, catalog, limit = 8, title = true }: P & { catalog: Catalog | null; limit?: number; title?: boolean }) {
   if (!catalog?.themes.length) return null;
-  const themes = [...catalog.themes].sort((a, b) => Number(b.isFeatured) - Number(a.isFeatured)).slice(0, 8);
+  const themes = [...catalog.themes].sort((a, b) => Number(b.isFeatured) - Number(a.isFeatured)).slice(0, limit);
   return (
     <section id="themes" style={{ scrollMarginTop: 80 }}>
       <WaveDivider color="var(--blue-500)" variant="playful" height={70} />
       <div style={{ background: "var(--blue-500)", padding: "40px 0 70px", position: "relative" }}>
         <div className="sl-wrap">
-          <SectionTitle light sub={d.home.themesSub}>{d.home.themesTitle}</SectionTitle>
+          {title && <SectionTitle light sub={d.home.themesSub}>{d.home.themesTitle}</SectionTitle>}
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(min(150px,40%),1fr))", gap: "clamp(14px, 2vw, 22px)" }}>
             {themes.map((t, i) => (
               <Card key={t.slug} tone="white" interactive padding="clamp(14px, 2vw, 22px)" tilt={[-1.5, 1, -0.5, 1.5][i % 4]} style={{ display: "grid", gap: 12 }}>
@@ -135,13 +135,13 @@ export function Themes({ d, catalog }: P & { catalog: Catalog | null }) {
   );
 }
 
-export function Styles({ d, catalog }: P & { catalog: Catalog | null }) {
+export function Styles({ d, catalog, title = true }: P & { catalog: Catalog | null; title?: boolean }) {
   if (!catalog?.styles.length) return null;
   const tones = ["sun", "sky", "bubble", "grape"] as const;
   return (
     <section style={{ padding: "var(--section-y) 0" }}>
       <div className="sl-wrap">
-        <SectionTitle sub={d.home.stylesSub}>{d.home.stylesTitle}</SectionTitle>
+        {title && <SectionTitle sub={d.home.stylesSub}>{d.home.stylesTitle}</SectionTitle>}
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(min(150px,40%),1fr))", gap: "clamp(18px, 3vw, 30px)" }}>
           {catalog.styles.map((s, i) => (
             <div key={s.slug} style={{ display: "grid", gap: 14, transform: `rotate(${[-1.5, 1, -1, 1.5][i % 4]}deg)` }}>
@@ -157,12 +157,12 @@ export function Styles({ d, catalog }: P & { catalog: Catalog | null }) {
   );
 }
 
-export function Sample({ d, locale }: P) {
+export function Sample({ d, locale, title = true }: P & { title?: boolean }) {
   const h = d.home;
   return (
     <section id="sample" style={{ padding: "0 0 var(--section-y)", scrollMarginTop: 80 }}>
       <div className="sl-wrap">
-        <SectionTitle sub={h.sampleSub}>{h.sampleTitle}</SectionTitle>
+        {title && <SectionTitle sub={h.sampleSub}>{h.sampleTitle}</SectionTitle>}
         <SampleBook locale={locale} pages={h.samplePages} prevLabel={h.samplePrev} nextLabel={h.sampleNext} pageOfLabels={h.samplePages.map((_, i) => h.samplePageOf(i + 1, h.samplePages.length))} />
       </div>
     </section>
@@ -239,7 +239,7 @@ export function Gifts({ d }: P) {
   );
 }
 
-export function Pricing({ d, locale, catalog }: P & { catalog: Catalog | null }) {
+export function Pricing({ d, locale, catalog, title = true }: P & { catalog: Catalog | null; title?: boolean }) {
   const h = d.home;
   const products = catalog?.products ?? [];
   // "Best value" is computed (lowest price per story page), never a made-up popularity claim.
@@ -248,7 +248,7 @@ export function Pricing({ d, locale, catalog }: P & { catalog: Catalog | null })
   return (
     <section id="pricing" style={{ padding: "0 0 var(--section-y)", scrollMarginTop: 80 }}>
       <div className="sl-wrap">
-        <SectionTitle sub={h.pricingSub}>{h.pricingTitle}</SectionTitle>
+        {title && <SectionTitle sub={h.pricingSub}>{h.pricingTitle}</SectionTitle>}
         {products.length === 0 ? (
           <p style={{ textAlign: "center", color: "var(--ink-500)" }}>{h.pricingUnavailable}</p>
         ) : (
@@ -286,13 +286,13 @@ export function Pricing({ d, locale, catalog }: P & { catalog: Catalog | null })
   );
 }
 
-export function Faq({ d }: P) {
+export function Faq({ d, items = d.home.faqs, title = true }: P & { items?: ReadonlyArray<{ q: string; a: string }>; title?: boolean }) {
   return (
     <section id="faq" style={{ padding: "0 0 var(--section-y)", scrollMarginTop: 80 }}>
       <div className="sl-wrap" style={{ maxWidth: 860 }}>
-        <SectionTitle>{d.home.faqTitle}</SectionTitle>
+        {title && <SectionTitle>{d.home.faqTitle}</SectionTitle>}
         <div style={{ display: "grid", gap: 16 }}>
-          {d.home.faqs.map((f, i) => (
+          {items.map((f, i) => (
             <details key={f.q} className="sl-card sl-faq" style={{ ["--_pad" as string]: "0px", background: i % 2 ? "var(--white)" : "var(--tint-sky)" }}>
               <summary style={{ listStyle: "none", cursor: "pointer", padding: "20px 24px", display: "flex", gap: 14, alignItems: "center", font: "var(--type-h4)", color: "var(--ink-900)" }}>
                 <Icon name="question" color="var(--blue-500)" size={26} />

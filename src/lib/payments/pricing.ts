@@ -63,5 +63,5 @@ export function computeOrderTotals(product: Product, discount: DiscountCode | nu
 
 /** Format minor units for display, e.g. 1900 USD -> "$19.00". */
 export function formatMoney(amount: number, currency: string, locale = "en"): string {
-  return new Intl.NumberFormat(locale === "ar" ? "ar" : "en", { style: "currency", currency }).format(amount / 100);
+  return new Intl.NumberFormat(locale === "ar" ? "ar-u-nu-arab" : "en", { style: "currency", currency }).format(amount / 100);
 }

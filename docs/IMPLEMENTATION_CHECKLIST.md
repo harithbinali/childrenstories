@@ -51,7 +51,7 @@ Legend: ✅ done & verified · 🟡 built, not yet verified against the live ser
 | 3 | Storyling tokens (verbatim), self-hosted fonts + icons, 24 components ported to TSX, `/design-system` | ✅ screenshot-reviewed EN/AR, phone/tablet/desktop |
 | 3 | i18n: locale routing (cookie / Accept-Language rewrite), EN + AR dictionaries, RTL | ✅ |
 | 8 | Homepage (all 12 sections from the brief) | ✅ reviewed · illustrations are placeholders until generated (B2) |
-| 8 | Other public pages (how it works, themes, styles, examples, pricing, FAQ, about, contact, legal) | ⏳ |
+| 8 | Other public pages (how it works, themes, styles, examples, pricing, FAQ, about, contact) + privacy, terms, refund policy, child photo privacy, sitemap, robots | ✅ reviewed EN/AR at all sizes · legal text has highlighted [PLACEHOLDERS] that need legal review (B5) |
 | 10 | Dashboard shell (sidebar / mobile tab bar) + overview (children, stats, bookshelf, activity, empty states) | ✅ reviewed via preview route · 🟡 live data (B2) |
 | 10 | Children (+ photo upload), character studio, books, drafts, favourites | ✅ reviewed via preview routes · 🟡 live data (B2) |
 | 10 | Orders (receipts, discounts, refunds), settings (profile, language, marketing opt-in, password change, account deletion with 7-day grace + cancel, sign out) | ✅ reviewed via preview routes · deletion/support rules DB-tested · 🟡 live data (B2) |

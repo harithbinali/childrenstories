@@ -29,5 +29,5 @@ export function negotiateLocale(acceptLanguage: string | null | undefined): Loca
 
 /** Medium date in the UI language (Arabic uses Eastern Arabic numerals). */
 export function formatDate(iso: string, l: Locale, withTime = false): string {
-  return new Intl.DateTimeFormat(l === "ar" ? "ar" : "en-GB", withTime ? { dateStyle: "medium", timeStyle: "short" } : { dateStyle: "medium" }).format(new Date(iso));
+  return new Intl.DateTimeFormat(l === "ar" ? "ar-u-nu-arab" : "en-GB", withTime ? { dateStyle: "medium", timeStyle: "short" } : { dateStyle: "medium" }).format(new Date(iso));
 }

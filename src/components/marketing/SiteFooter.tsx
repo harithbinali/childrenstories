@@ -21,7 +21,12 @@ export async function SiteFooter({ d, locale }: { d: Dictionary; locale: Locale 
     <footer>
       <WaveDivider color="var(--night-900)" variant="drip" height={70} />
       <div style={{ background: "var(--night-900)", color: "var(--ink-200)", position: "relative", padding: "40px 0 36px" }}>
-        <FloatingDecor preset="night" />
+        {/* Decor stays in the top band, clear of the wordmark, tagline and links. */}
+        <FloatingDecor items={[
+          { icon: "moon-stars", color: "var(--sun-400)", size: 34, top: "3%", end: "3%", anim: "float" },
+          { icon: "star", color: "var(--sun-200)", size: 12, top: "4%", start: "38%", anim: "twinkle" },
+          { icon: "sparkle", color: "var(--grape-400)", size: 16, top: "2%", end: "28%", anim: "twinkle", delay: 1.1 },
+        ]} />
         <div className="sl-wrap" style={{ position: "relative", display: "flex", flexWrap: "wrap", gap: 30, justifyContent: "space-between", alignItems: "center" }}>
           <div>
             <div style={{ font: "700 36px/1 var(--font-display)", color: "#fff" }}>{d.brand}</div>
