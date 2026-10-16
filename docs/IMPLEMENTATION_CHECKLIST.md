@@ -53,12 +53,13 @@ Legend: ✅ done & verified · 🟡 built, not yet verified against the live ser
 | 8 | Homepage (all 12 sections from the brief) | ✅ reviewed · illustrations are placeholders until generated (B2) |
 | 8 | Other public pages (how it works, themes, styles, examples, pricing, FAQ, about, contact, legal) | ⏳ |
 | 10 | Dashboard shell (sidebar / mobile tab bar) + overview (children, stats, bookshelf, activity, empty states) | ✅ reviewed via preview route · 🟡 live data (B2) |
-| 10 | Children, characters, books, drafts, favourites, orders, settings, support pages | ⏳ |
-| 12 | Storybook creator wizard | ⏳ (server pieces exist) |
-| 14 | Tablet reader | ⏳ (`BookPage` + layout spec ready) |
-| 16 | Permanent library, favorites, drafts | ⏳ (schema ready) |
+| 10 | Children (+ photo upload), character studio, books, drafts, favourites | ✅ reviewed via preview routes · 🟡 live data (B2) |
+| 10 | Orders (receipts, discounts, refunds), settings (profile, language, marketing opt-in, password change, account deletion with 7-day grace + cancel, sign out) | ✅ reviewed via preview routes · deletion/support rules DB-tested · 🟡 live data (B2) |
+| 12 | Storybook creator wizard + book workspace (story editor, previews, checkout panel, production progress) | ✅ reviewed via preview routes · 🟡 live AI/payments (B2/B3) |
+| 14 | Tablet reader: spreads/single pages, swipe/tap/keys (RTL-aware), auto-hiding controls, fullscreen, thumbnails, resume position | ✅ reviewed EN/AR phone/tablet/desktop + interaction script · 🟡 live data (B2) |
+| 16 | Permanent library, favorites, drafts | ✅ pages built · 🟡 live data (B2) |
 | 19 | Admin dashboard | ⏳ |
-| 23 | Support tickets UI | ⏳ (schema + RLS tested) |
+| 23 | Support tickets UI (list, new request linked to a book/order, conversation, reply, close) | ✅ reviewed via preview routes · RLS tested · staff side ships with the admin dashboard |
 | 26 | E2E tests (Playwright) | ⏳ |
 | 27 | Vercel + worker deployment | ⛔ B4 |
 

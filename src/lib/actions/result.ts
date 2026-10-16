@@ -6,7 +6,7 @@ import { RateLimitedError } from "@/lib/rate-limit";
 export type ActionError =
   | "invalid_input" | "not_found" | "forbidden" | "rate_limited" | "not_configured" | "flagged"
   | "moderation_unavailable" | "unsupported_image" | "image_too_large" | "image_too_small" | "duplicate_photo"
-  | "too_many_photos" | "guardian_required" | "wrong_state" | LimitCode | "unknown";
+  | "too_many_photos" | "guardian_required" | "wrong_state" | "wrong_password" | "weak_password" | "ticket_closed" | LimitCode | "unknown";
 
 export type ActionResult<T = undefined> = { ok: true; data: T } | { ok: false; error: ActionError };
 

@@ -16,7 +16,11 @@ import { BookWorkspaceView } from "@/components/book-workspace/BookWorkspaceView
 import { PageBody, PageHeader } from "@/components/dashboard/ui/PageHeader";
 import { Reader } from "@/components/reader/Reader";
 import { readerLabels } from "@/components/reader/labels";
-import { previewReaderBook, previewCatalog, previewCharacter, previewChildDetail, previewChildren, previewCreatorData, previewWorkspace } from "@/lib/preview-fixtures";
+import { OrdersView } from "@/components/account/OrdersView";
+import { SettingsView } from "@/components/account/SettingsView";
+import { NewTicketView, SupportListView, TicketView } from "@/components/support/SupportViews";
+import { ReplyForm } from "@/components/support/SupportForms";
+import { previewOrders, previewSettings, previewTicket, previewTickets, previewReaderBook, previewCatalog, previewCharacter, previewChildDetail, previewChildren, previewCreatorData, previewWorkspace } from "@/lib/preview-fixtures";
 import { isLocale, type Locale } from "@/i18n/config";
 import { getDictionary, type Dictionary } from "@/i18n/dictionaries";
 import { Gate } from "../../gate";
@@ -44,6 +48,14 @@ const SCREENS: Record<string, (d: Dictionary, l: Locale) => ReactNode> = {
   "book-preview-landscape": (d, l) => <BookWorkspaceView d={d} locale={l} b={previewWorkspace(l, "preview_ready", "landscape")} />,
   "book-producing": (d, l) => <BookWorkspaceView d={d} locale={l} b={previewWorkspace(l, "producing")} />,
   "book-completed": (d, l) => <BookWorkspaceView d={d} locale={l} b={previewWorkspace(l, "completed")} />,
+  orders: (d, l) => <OrdersView d={d} locale={l} orders={previewOrders(l)} />,
+  "orders-empty": (d, l) => <OrdersView d={d} locale={l} orders={[]} />,
+  settings: (d, l) => <SettingsView d={d} locale={l} s={{ ...previewSettings(), locale: l }} />,
+  "settings-deleting": (d, l) => <SettingsView d={d} locale={l} s={{ ...previewSettings(true), locale: l }} />,
+  support: (d, l) => <SupportListView d={d} locale={l} tickets={previewTickets(l)} />,
+  "support-new": (d, l) => <NewTicketView d={d} locale={l} books={[{ id: "b1", title: previewWorkspace(l, "completed").title }]} orders={[{ id: "o2", number: 1042 }]} initial={{ category: "book" }} />,
+  "support-ticket": (d, l) => <TicketView d={d} locale={l} ticket={previewTicket(l)} userName="Hana"
+    replyForm={<ReplyForm ticketId="t2" errors={d.errors} labels={{ reply: d.support.reply, replyPlaceholder: d.support.replyPlaceholder, sending: d.support.sending }} />} />,
 };
 
 /** Full-screen screens that render without the dashboard shell. */

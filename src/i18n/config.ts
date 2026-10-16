@@ -26,3 +26,8 @@ export function negotiateLocale(acceptLanguage: string | null | undefined): Loca
     .sort((a, b) => b.q - a.q);
   return prefs.find((p) => isLocale(p.lang))?.lang as Locale | undefined ?? DEFAULT_LOCALE;
 }
+
+/** Medium date in the UI language (Arabic uses Eastern Arabic numerals). */
+export function formatDate(iso: string, l: Locale, withTime = false): string {
+  return new Intl.DateTimeFormat(l === "ar" ? "ar" : "en-GB", withTime ? { dateStyle: "medium", timeStyle: "short" } : { dateStyle: "medium" }).format(new Date(iso));
+}

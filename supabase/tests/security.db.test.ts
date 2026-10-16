@@ -208,4 +208,54 @@ describe("support", () => {
       ),
     ).rejects.toThrow(/row-level security/);
   });
+
+  it("a parent cannot open a ticket pre-prioritised, pre-assigned or for someone else", async () => {
+    for (const sql of [
+      `insert into support_tickets (owner_id, subject, priority) values ($1, 'Urgent!', 'urgent')`,
+      `insert into support_tickets (owner_id, subject, status) values ($1, 'Done', 'resolved')`,
+      `insert into support_tickets (owner_id, subject, assigned_to) values ($1, 'Mine', $1)`,
+    ]) {
+      await expect(as(pool, { role: "authenticated", sub: alice }, (c) => c.query(sql, [alice]))).rejects.toThrow(/row-level security/);
+    }
+    await expect(
+      as(pool, { role: "authenticated", sub: bob }, (c) => c.query(`insert into support_tickets (owner_id, subject) values ($1, 'As alice')`, [alice])),
+    ).rejects.toThrow(/row-level security/);
+  });
+
+  it("a parent cannot change a ticket's status directly, and cannot reply to a closed ticket", async () => {
+    const ticket = (await pool.query(`insert into support_tickets (owner_id, subject, status) values ($1, 'Old one', 'closed') returning id`, [alice])).rows[0].id;
+    const updated = await as(pool, { role: "authenticated", sub: alice }, async (c) => {
+      try { return (await c.query(`update support_tickets set status = 'open' where id = $1`, [ticket])).rowCount; } catch { return 0; }
+    });
+    expect(updated).toBe(0);
+    await expect(
+      as(pool, { role: "authenticated", sub: alice }, (c) => c.query(`insert into support_messages (ticket_id, author_id, body) values ($1, $2, 'hello?')`, [ticket, alice])),
+    ).rejects.toThrow(/row-level security/);
+  });
+
+  it("bob cannot read alice's tickets", async () => {
+    const n = await as(pool, { role: "authenticated", sub: bob }, async (c) => (await c.query(`select 1 from support_tickets where owner_id = $1`, [alice])).rowCount);
+    expect(n).toBe(0);
+  });
+});
+
+describe("account deletion requests", () => {
+  it("a parent can request deletion of their own account only, once at a time, with a grace period", async () => {
+    await expect(
+      as(pool, { role: "authenticated", sub: bob }, (c) => c.query(`insert into account_deletion_requests (user_id) values ($1)`, [alice])),
+    ).rejects.toThrow(/row-level security/);
+    await expect(
+      as(pool, { role: "authenticated", sub: alice }, (c) => c.query(`insert into account_deletion_requests (user_id, status) values ($1, 'completed')`, [alice])),
+    ).rejects.toThrow(/row-level security/);
+    const row = await as(pool, { role: "authenticated", sub: alice },
+      async (c) => (await c.query(`insert into account_deletion_requests (user_id) values ($1) returning scheduled_for > now() + interval '6 days' as later`, [alice])).rows[0], true);
+    expect(row.later).toBe(true);
+    await expect(
+      as(pool, { role: "authenticated", sub: alice }, (c) => c.query(`insert into account_deletion_requests (user_id) values ($1)`, [alice])),
+    ).rejects.toThrow(/duplicate key/);
+    // Cancelling (service role) frees the slot for a future request.
+    await pool.query(`update account_deletion_requests set status = 'cancelled' where user_id = $1`, [alice]);
+    const again = await as(pool, { role: "authenticated", sub: alice }, async (c) => (await c.query(`insert into account_deletion_requests (user_id) values ($1)`, [alice])).rowCount);
+    expect(again).toBe(1);
+  });
 });

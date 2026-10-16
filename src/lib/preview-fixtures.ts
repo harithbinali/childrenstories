@@ -5,6 +5,8 @@ import type { ChildDetail, ChildSummary } from "@/lib/children/queries";
 import type { CharacterDetail } from "@/lib/characters/queries";
 import type { BookWorkspace, CreatorData } from "@/lib/books/queries";
 import type { ReaderBook } from "@/lib/books/reader";
+import type { AccountSettings, OrderRow } from "@/lib/account/queries";
+import type { TicketDetail, TicketSummary } from "@/lib/support/queries";
 
 /**
  * INTERNAL PREVIEW DATA for /design-system/preview/* only — lets designers
@@ -135,4 +137,37 @@ export function previewReaderBook(locale: Locale, orientation: "portrait" | "lan
       { kind: "back_cover", imageUrl: null, pageNumber: null },
     ],
   };
+}
+
+export function previewOrders(locale: Locale): OrderRow[] {
+  const ar = locale === "ar";
+  return [
+    { id: "o2", orderNumber: 1042, status: "paid", createdAt: "2026-10-12T18:20:00Z", paidAt: "2026-10-12T18:21:00Z", currency: "USD", subtotal: 2400, discount: 240, total: 2160, refunded: 0, gateway: "stripe",
+      bookId: "b1", bookTitle: ar ? "ليلى والغيمة الضائعة" : "Layla and the Lost Cloud", items: [{ description: ar ? "كتاب قصص مخصص" : "Personalised storybook", pageCount: 12, unitAmount: 2400, quantity: 1 }], refunds: [] },
+    { id: "o1", orderNumber: 1017, status: "partially_refunded", createdAt: "2026-09-30T09:05:00Z", paidAt: "2026-09-30T09:06:00Z", currency: "USD", subtotal: 1900, discount: 0, total: 1900, refunded: 500, gateway: "paypal",
+      bookId: "b2", bookTitle: ar ? "عمر ونجمة البحر" : "Omar and the Starfish", items: [{ description: ar ? "كتاب قصص مخصص" : "Personalised storybook", pageCount: 8, unitAmount: 1900, quantity: 1 }],
+      refunds: [{ amount: 500, status: "succeeded", createdAt: "2026-10-02T10:00:00Z" }] },
+  ];
+}
+
+export function previewSettings(deletion = false): AccountSettings {
+  return { email: "hana@example.com", displayName: "Hana", locale: "en", marketingOptIn: false, usesPassword: true,
+    deletion: deletion ? { id: "x", status: "pending", requestedAt: "2026-10-15T10:00:00Z", scheduledFor: "2026-10-22T10:00:00Z" } : null };
+}
+
+export function previewTickets(locale: Locale): TicketSummary[] {
+  const ar = locale === "ar";
+  return [
+    { id: "t2", number: 208, subject: ar ? "لا يمكنني تنزيل ملف PDF" : "My book's PDF won't download", category: "book", status: "awaiting_customer", updatedAt: "2026-10-15T12:00:00Z", createdAt: "2026-10-14T20:00:00Z" },
+    { id: "t1", number: 175, subject: ar ? "سؤال عن الاسترداد" : "Question about a refund", category: "order", status: "resolved", updatedAt: "2026-10-03T08:00:00Z", createdAt: "2026-10-01T08:00:00Z" },
+  ];
+}
+
+export function previewTicket(locale: Locale): TicketDetail {
+  const ar = locale === "ar";
+  return { ...previewTickets(locale)[0], bookId: "b1", bookTitle: ar ? "ليلى والغيمة الضائعة" : "Layla and the Lost Cloud", orderNumber: 1042,
+    messages: [
+      { id: "m1", fromStaff: false, createdAt: "2026-10-14T20:00:00Z", body: ar ? "مرحباً، عند الضغط على تنزيل لا يحدث شيء. هل يمكنكم المساعدة؟" : "Hi! When I press download nothing happens. Could you help?" },
+      { id: "m2", fromStaff: true, createdAt: "2026-10-15T12:00:00Z", body: ar ? "شكراً لتواصلك! أعدنا تجهيز الملف. هل يمكنك المحاولة مرة أخرى وإخبارنا بالنتيجة؟" : "Thanks for getting in touch! We've rebuilt the file. Could you try again and let us know how it goes?" },
+    ] };
 }
