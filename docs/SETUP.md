@@ -62,8 +62,9 @@ changing `src/lib/email/layout.ts` with `npx tsx scripts/build-auth-email-templa
 
 ## 7. Vercel (web app)
 Import the GitHub repo, framework Next.js, set all env vars from `.env.example`
-(except `TEST_DATABASE_URL`). `vercel.json` schedules `/api/cron/jobs` every 5 minutes
-(needs a plan that allows that frequency) with `Authorization: Bearer $CRON_SECRET`.
+(except `TEST_DATABASE_URL`). `vercel.json` runs `/api/cron/jobs` once a day as a safety
+net (Vercel's free plan allows only daily crons); the worker below does the real job
+processing continuously. On a paid Vercel plan you can raise the cron frequency.
 
 ## 8. Worker
 Image generation and PDF rendering run in the worker, not in Vercel functions.
@@ -75,3 +76,26 @@ Concurrency per process: Admin > Usage Limits > worker concurrency.
 Enable Supabase PITR (point-in-time recovery) on the production project. Storage objects
 are not covered by database backups: schedule a storage export (e.g. `rclone` to S3) for
 `illustrations`, `character-refs` and `book-pdfs`. Purchased books are never auto-deleted.
+
+## Cloud-only setup (no local machine)
+Everything below happens in a web browser.
+
+1. **Database — Supabase.** Create a project at supabase.com. Open SQL Editor, paste the
+   whole of `supabase/setup.sql` from GitHub, and run it once. (It is every migration in
+   order; regenerate it with `npx tsx scripts/build-supabase-setup-sql.ts`.) Then
+   Authentication → URL configuration: set the Site URL to your Vercel address, and paste
+   the email templates from `supabase/templates/`. Copy the project URL, anon key and
+   service-role key from Project settings → API.
+2. **Website — Vercel.** vercel.com → Add New → Project → import
+   `harithbinali/childrenstories`. Add the environment variables from `.env.example`
+   (Supabase values, `OPENAI_API_KEY`, `CRON_SECRET`, `NEXT_PUBLIC_SITE_URL` = the Vercel
+   address). Set Settings → Git → Production Branch to the branch you deploy (`develop`
+   until it is merged into `main`). Deploy.
+3. **Background worker — Railway** (or any container host). railway.com → New Project →
+   Deploy from GitHub repo → the same repo. `railway.json` builds `worker/Dockerfile`.
+   Add the same environment variables. This service writes stories, draws pictures and
+   binds PDFs; without it, books stay "in progress".
+4. **Make yourself admin.** Sign up on the site, then in Supabase SQL Editor run:
+   `insert into public.user_roles (user_id, role) select id, 'admin' from auth.users where email = 'you@example.com';`
+5. Later: Stripe/PayPal sandbox keys and webhooks (sections 4–5), Resend for email.
+
