@@ -7,6 +7,8 @@ const TINT: Record<string, string> = {
 };
 
 export type CardProps = HTMLAttributes<HTMLElement> & {
+  /** Forwarded when `as` is a link component. */
+  href?: string;
   tone?: keyof typeof TINT | string;
   variant?: "elevated" | "flat" | "sticker" | "outlined";
   wobble?: boolean;
