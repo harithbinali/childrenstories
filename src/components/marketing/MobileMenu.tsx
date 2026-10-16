@@ -1,14 +1,16 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { usePathname } from "next/navigation";
 import { Button, IconButton } from "@/components/storyling";
 
 export function MobileMenu({ links, cta, ctaHref, login, menuLabel, closeLabel }: {
   links: Array<{ href: string; label: string }>; cta: string; ctaHref: string; login: string; menuLabel: string; closeLabel: string;
 }) {
-  const [open, setOpen] = useState(false);
+  // The menu belongs to the page it was opened on, so navigating closes it.
   const pathname = usePathname();
-  useEffect(() => setOpen(false), [pathname]);
+  const [openOn, setOpenOn] = useState<string | null>(null);
+  const open = openOn === pathname;
+  const setOpen = (v: boolean) => setOpenOn(v ? pathname : null);
   return (
     <>
       <IconButton icon={open ? "x" : "list"} label={open ? closeLabel : menuLabel} size="sm" aria-expanded={open} aria-controls="mobile-menu" onClick={() => setOpen(!open)} />
