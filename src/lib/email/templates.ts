@@ -3,8 +3,9 @@
  * password reset — are sent by Supabase Auth using supabase/templates/*.html.
  *
  * Templates never include child photographs or generated illustrations.
- * Visual styling is a placeholder until Storyling email tokens are applied.
+ * Layout and colours: ./layout.ts (shared with the Supabase Auth templates).
  */
+import { emailShell } from "./layout";
 
 export type EmailTemplate = "welcome" | "payment_receipt" | "book_ready" | "refund_confirmation" | "support_reply";
 
@@ -25,21 +26,17 @@ type Rendered = { subject: string; html: string; text: string };
 
 const esc = (s: string) => s.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]!);
 
-function layout(d: EmailData, heading: string, paragraphs: string[], cta?: { label: string; href: string }): string {
-  const dir = d.locale === "ar" ? "rtl" : "ltr";
-  return `<!doctype html><html lang="${d.locale}" dir="${dir}"><body style="margin:0;background:#fff7ec;font-family:Arial,Helvetica,sans-serif;color:#2b2238">
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr><td align="center" style="padding:32px 16px">
-<table role="presentation" width="100%" style="max-width:560px;background:#ffffff;border-radius:24px;padding:32px" cellpadding="0" cellspacing="0">
-<tr><td style="font-size:22px;font-weight:bold;padding-bottom:16px">${esc(d.brand)}</td></tr>
-<tr><td style="font-size:20px;font-weight:bold;padding-bottom:12px">${esc(heading)}</td></tr>
-${paragraphs.map((p) => `<tr><td style="font-size:16px;line-height:1.6;padding-bottom:12px">${esc(p)}</td></tr>`).join("")}
-${cta ? `<tr><td style="padding:16px 0"><a href="${esc(cta.href)}" style="display:inline-block;background:#2b2238;color:#ffffff;text-decoration:none;padding:12px 22px;border-radius:999px;font-weight:bold">${esc(cta.label)}</a></td></tr>` : ""}
-</table></td></tr></table></body></html>`;
+function layout(d: EmailData, heading: string, paragraphs: string[], cta: { label: string; href: string }, footer: string): string {
+  return emailShell({
+    lang: d.locale, brand: esc(d.brand), siteUrl: esc(d.siteUrl), preheader: esc(paragraphs[1] ?? heading), heading: esc(heading),
+    paragraphs: paragraphs.map(esc), cta: { label: esc(cta.label), href: esc(cta.href) }, footer: esc(footer),
+  });
 }
 
 const copy = {
   en: {
     hi: (n?: string | null) => (n ? `Hi ${n},` : "Hi there,"),
+    footer: (b: string) => `You're receiving this because you have a ${b} account.`,
     welcome: { subject: (b: string) => `Welcome to ${b}!`, heading: "Your storybook adventure starts here", body: "Create a character for your child and turn them into the hero of their very own book.", cta: "Create my storybook" },
     receipt: { subject: (n?: number) => `Receipt for order #${n}`, heading: "Thank you for your order", body: (t?: string, a?: string) => `We've received your payment of ${a} for "${t}". We're now preparing the final illustrations — we'll email you when your book is ready.`, cta: "View order" },
     ready: { subject: (t?: string) => `"${t}" is ready to read!`, heading: "Your storybook is ready", body: (t?: string) => `"${t}" has been illustrated and saved to your library. You can read it online or download the PDF.`, cta: "Open my book" },
@@ -48,6 +45,7 @@ const copy = {
   },
   ar: {
     hi: (n?: string | null) => (n ? `مرحباً ${n}،` : "مرحباً،"),
+    footer: (b: string) => `تصلك هذه الرسالة لأن لديك حساباً في ${b}.`,
     welcome: { subject: (b: string) => `أهلاً بك في ${b}!`, heading: "تبدأ مغامرة كتابك من هنا", body: "أنشئ شخصية لطفلك واجعله بطل كتابه الخاص.", cta: "أنشئ كتابي" },
     receipt: { subject: (n?: number) => `إيصال الطلب رقم ${n}`, heading: "شكراً لطلبك", body: (t?: string, a?: string) => `استلمنا دفعتك بقيمة ${a} لكتاب «${t}». نقوم الآن بتجهيز الرسومات النهائية، وسنرسل لك بريداً عندما يصبح كتابك جاهزاً.`, cta: "عرض الطلب" },
     ready: { subject: (t?: string) => `كتاب «${t}» جاهز للقراءة!`, heading: "كتابك جاهز", body: (t?: string) => `تم رسم «${t}» وحفظه في مكتبتك. يمكنك قراءته على الإنترنت أو تنزيل ملف PDF.`, cta: "افتح كتابي" },
@@ -82,5 +80,5 @@ export function renderEmail(t: EmailTemplate, d: EmailData): Rendered {
       cta = { label: c.support.cta, href: `${d.siteUrl}/dashboard/support/${d.ticketId}` };
       break;
   }
-  return { subject, html: layout(d, heading, [hi, body], cta), text: `${hi}\n\n${body}\n\n${cta.label}: ${cta.href}` };
+  return { subject, html: layout(d, heading, [hi, body], cta, c.footer(d.brand)), text: `${hi}\n\n${body}\n\n${cta.label}: ${cta.href}` };
 }

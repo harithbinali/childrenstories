@@ -45,7 +45,7 @@ Legend: ✅ done & verified · 🟡 built, not yet verified against the live ser
 | 22 | Upload validation by magic bytes + parsed dimensions + truncation | ✅ tests with real JPG/PNG/WebP |
 | 22 | DB-backed rate limiting | ✅ DB test |
 | 22 | Audit log (append-only, immutable) | ✅ DB test |
-| 23 | Transactional emails (bilingual, idempotent, no child images) | 🟡 · Storyling styling ⏳ |
+| 23 | Transactional emails (bilingual, idempotent, no child images) in the Storyling email layout + bilingual Supabase Auth templates (`supabase/templates/`) | ✅ rendered and reviewed EN/AR, unit-tested · 🟡 live sending (Resend key, B2) · templates must be pasted into Supabase |
 | 9 | Auth guards (DAL), proxy session refresh, roles | 🟡 |
 | 9 | Auth UI: login, register, forgot/reset password, verify email, callback route, optional Google | ✅ renders EN/AR at all sizes · 🟡 live sign-in (B2) |
 | 3 | Storyling tokens (verbatim), self-hosted fonts + icons, 24 components ported to TSX, `/design-system` | ✅ screenshot-reviewed EN/AR, phone/tablet/desktop |

@@ -54,8 +54,11 @@ Create a REST app (sandbox first). Set `PAYPAL_CLIENT_ID`, `PAYPAL_CLIENT_SECRET
 
 ## 6. Email (Resend)
 Verify your sending domain; set `RESEND_API_KEY` and `EMAIL_FROM`.
-Auth emails (verify, reset) are sent by Supabase Auth. Storyling-branded templates for
-them (`supabase/templates/`) are pending the design system; until then Supabase defaults apply.
+Auth emails (verify, reset, magic link, email change, invite, reauthentication) are sent by
+Supabase Auth. Storyling-branded, bilingual templates are in `supabase/templates/`. Paste each
+into Dashboard → Authentication → Emails → Templates (see `supabase/templates/README.md` for
+the subjects). Until you do, Supabase's default emails are sent. Regenerate them after
+changing `src/lib/email/layout.ts` with `npx tsx scripts/build-auth-email-templates.ts`.
 
 ## 7. Vercel (web app)
 Import the GitHub repo, framework Next.js, set all env vars from `.env.example`
